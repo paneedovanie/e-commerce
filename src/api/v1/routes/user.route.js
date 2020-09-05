@@ -1,25 +1,11 @@
 const router = require('express').Router()
 const userController = require('./controllers/user.controller')
-const { createUserValidation, updateUserValidation, loginUserValidation, usernameExists, usernameNotExists, emailNotExists, hashPassword } = require('./middlewares/user.validation')
-const { checkIfValidId } = require('./middlewares/general.validation')
 
-// REGISTER USER
-router.post(
-	'/register', 
-	[
-		createUserValidation, 
-		usernameNotExists, 
-		emailNotExists,
-		hashPassword
-	], 
-	userController.register
-)
 
-// REGISTER LOGIN
+// CREATE USER
 router.post(
-	'/login', 
-	loginUserValidation,
-	userController.login
+	'/', 
+	userController.createOne
 )
 
 // READ ALL USERS
@@ -27,6 +13,18 @@ router.get(
 		'/', 
 		userController.readAll
 	)
+
+// REGISTER USER
+router.post(
+	'/register', 
+	userController.register
+)
+
+// REGISTER LOGIN
+router.post(
+	'/login', 
+	userController.login
+)
 
 // READ ALL TRASHED USERS
 router.get(
@@ -37,50 +35,30 @@ router.get(
 // READ USER
 router.get(
 		'/:id', 
-		checkIfValidId, 
 		userController.readOne
-	)
-
-// CREATE USER
-router.post(
-        '/', 
-        [
-            createUserValidation, 
-            usernameNotExists, 
-            emailNotExists,
-            hashPassword
-        ], 
-        userController.createOne
 	)
 	
 // UPDATE USER
 router.patch(
-		'/:id', 
-		[
-			checkIfValidId,
-			updateUserValidation
-		], 
+		'/:id',
 		userController.updateOne
 	)
 
 // TRASH USER
 router.patch(
 		'/:id/trash', 
-		checkIfValidId, 
 		userController.trashOne
 	)
 
 // RESTORE USER
 router.patch(
 		'/:id/restore', 
-		checkIfValidId, 
 		userController.restoreOne
 	)
 
 // DELETE USER
 router.delete(
 		'/:id', 
-		checkIfValidId, 
 		userController.deleteOnePermanently
 	)
 

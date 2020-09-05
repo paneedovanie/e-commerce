@@ -1,7 +1,9 @@
 const { read, readSingle, create, update, trash, restore, deletePermanently } = require('../../../../services/user.service')
 const jwt = require('jsonwebtoken');
+const { filterJoiErrors } = require('../../../../helpers/error.helper')
+const { checkIfValidId, createUserValidation, updateUserValidation, loginUserValidation, usernameExists, emailExists, hashPassword } = require('../../../../helpers/validation.helper')
 
-async function readAll (req, res) {
+exports.readAll = async function (req, res) {
     try {
         const result = await read({deletedAt: ''})
         res.status(201).json(result)
@@ -11,7 +13,7 @@ async function readAll (req, res) {
     }
 }
 
-async function readAllTrash (req, res) {
+exports.readAllTrash = async function (req, res) {
     try {
         const result = await read({deletedAt: {$ne: ''}})
         res.status(201).json(result)
@@ -21,8 +23,10 @@ async function readAllTrash (req, res) {
     }
 }
 
-async function readOne (req, res) {
+exports.readOne = async function (req, res) {
     try {
+        if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
+        
         const result = await readSingle(req.params.id)
         res.status(201).json(result)
     }
@@ -31,39 +35,78 @@ async function readOne (req, res) {
     }
 }
 
-async function createOne (req, res) {
+exports.createOne = async function (req, res) {
+    let errors = [];
+
     try {
-        const result = await create(req.body)
-        res.status(201).json(result)
+        const isInputValid = createUserValidation(req.body)
+        if(isInputValid.error) res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
+
+        const isUsernameValid = await usernameExists(req.body.username)
+        if(isUsernameValid) errors.push("username already exists")
+
+        const isEmailValid = await emailExists(req.body.email)
+        if(isEmailValid) errors.push("email already exists")
+
+        if(errors.length) return res.status(400).json({errors})
+
+        req.body.password = hashPassword(req.body.password)
+
+        const user = await create(req.body)
+        user = user._doc
+        delete user.password
+
+        res.status(201).json(user)
     }
     catch (e) {
         res.status(500).send(e.message)
     }
 }
 
-async function updateOne (req, res) {
+exports.updateOne = async function (req, res) {
+    let errors = []
+
     try {
-        const result = await update(req.params.id, req.body)
-        res.status(202).json(result)
+        if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
+
+        const validInput = updateUserValidation(req.body)
+        if(validInput.error) return res.status(400).json({errors: filterJoiErrors(validInput.error.details)});
+
+        const isUsernameValid = await usernameExists(req.body.username, req.params.id)
+        if(isUsernameValid) errors.push("username already exists")
+        
+        const isEmailValid = await emailExists(req.body.email, req.params.id)
+        if(isEmailValid) errors.push("email already exists")
+
+        if(errors.length) return res.status(400).json({errors})
+
+        let user = await update(req.params.id, req.body)
+        user = user._doc
+        delete user.password
+
+        res.status(202).json(user)
     }
     catch (e) {
         res.status(500).send(e.message)
     }
 }
 
-async function trashOne (req, res) {
+exports.trashOne = async function (req, res) {
     try {
+        if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
+        
         const result = await trash(req.params.id)
         res.status(202).json(result)
     }
     catch (e) {
-        console.log(req.params)
         res.status(500).send(e.message)
     }
 }
 
-async function restoreOne (req, res) {
+exports.restoreOne = async function (req, res) {
     try {
+        if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
+        
         const result = await restore(req.params.id)
         res.status(202).json(result)
     }
@@ -72,8 +115,10 @@ async function restoreOne (req, res) {
     }
 }
 
-async function deleteOnePermanently (req, res) {
+exports.deleteOnePermanently = async function (req, res) {
     try {
+        if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
+        
         const result = await deletePermanently(req.params.id)
         res.status(202).json(result)
     }
@@ -82,9 +127,25 @@ async function deleteOnePermanently (req, res) {
     }
 }
 
-async function register (req, res) {
+exports.register = async function (req, res) {
+    let errors = [];
+
     try {
-		let user = await create(req.body)
+        const isInputValid = createUserValidation(req.body)
+        if(isInputValid.error) res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
+
+        const isUsernameValid = await usernameExists(req.body.username)
+        if(isUsernameValid) errors.push("username already exists")
+        
+        const isEmailValid = await emailExists(req.body.email)
+        if(isEmailValid) errors.push("email already exists")
+
+        if(errors.length) return res.status(400).json({errors})
+
+        req.body.password = hashPassword(req.body.password)
+
+        let user = await create(req.body)
+        user = user._doc
 		const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET)
 		delete user.password
 		
@@ -95,9 +156,18 @@ async function register (req, res) {
     }
 }
 
-async function login (req, res) {
+exports.login = async function (req, res) {
+    const validInput = loginUserValidation(req.body)
+    if(validInput.error) return res.status(400).json({errors: filterJoiErrors(validInput.error.details)})
+
+    const user = await User.findOne({username: req.body.username})
+    if(!user) return res.status(400).json({errors: ["username doesn't exists"]})
+    
+    if(!bcrypt.compareSync(req.body.password, user.password))
+        return res.status(400).json({errors: ["password didn't match"]})
+
     try {
-		let user = await readSingle(req.params.id)
+		let user = await readSingle(user._id)
 		const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
 		delete user.password
 		
@@ -106,17 +176,4 @@ async function login (req, res) {
     catch (e) {
         res.status(500).send(e.message)
     }
-}
-
-module.exports = {
-    readAll,
-	readAllTrash,
-	readOne,
-    createOne,
-    updateOne,
-    trashOne,
-    restoreOne,
-	deleteOnePermanently,
-	register,
-	login
 }

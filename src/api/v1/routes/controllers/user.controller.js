@@ -173,7 +173,12 @@ exports.login = async function (req, res) {
     let user = await readSingleByQuery({username: req.body.username})
     if(!user) return res.status(400).json({errors: ["username doesn't exists"]})
     
-    if(user.deleteAt !== '') return res.status(400).json({errors: ["your account is disabled"]})
+    try {
+        let time = await user.deletedAt.getTime()
+        return res.status(400).json({errors: ["your account is disabled"]})
+    } catch (e) {
+        //
+    }
     
     if(!bcrypt.compareSync(req.body.password, user.password))
         return res.status(400).json({errors: ["password didn't match"]})

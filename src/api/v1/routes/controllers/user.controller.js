@@ -52,7 +52,7 @@ exports.createOne = async function (req, res) {
 
         req.body.password = hashPassword(req.body.password)
 
-        const user = await create(req.body)
+        let user = await create(req.body)
         user = user._doc
         delete user.password
 

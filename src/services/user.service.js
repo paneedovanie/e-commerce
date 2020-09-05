@@ -20,6 +20,15 @@ function readSingle (id) {
     }
 }
 
+//READ ONE BY QUERY
+function readSingleByQuery (body) {
+    try {
+        return User.findOne(body);
+    } catch (e) {
+        throw new Error(e.message)
+    }
+}
+
 //CREATE ONE
 function create (body) {
     try {
@@ -69,6 +78,7 @@ function deletePermanently (id) {
 module.exports = {
     read,
     readSingle,
+    readSingleByQuery,
     create,
     update,
     trash,

@@ -36,13 +36,13 @@ exports.updateUserValidation = function (input) {
     return joiSchema.validate(input);
 }
 
-exports.loginUserValidation = function (req, res, next) {
+exports.loginUserValidation = function (body) {
     const joiSchema = joi.object({
-        username: joi.string().required().min(6).max(255),
-        password: joi.string().required().min(6).max(255),
+        username: joi.string().required().max(255),
+        password: joi.string().required().max(255),
     }).options({abortEarly: false});
 
-    return joiSchema.validate(req.body);
+    return joiSchema.validate(body);
 }
 
 exports.usernameExists = async function (input, id) {

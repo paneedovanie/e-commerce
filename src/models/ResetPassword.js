@@ -6,10 +6,18 @@ const schema = mongoose.Schema({
         required: true,
         max: 255
     },
+    createdAt: {
+        type: Date,
+        default: new Date()
+    },
+    updatedAt: {
+        type: Date,
+        default: new Date()
+    },
     deletedAt: {
         type: Date,
         default: ''
     }
-}, {timestamps: true});
+});
 
 module.exports = mongoose.model('ResetPassword', schema);

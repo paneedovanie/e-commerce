@@ -15,10 +15,18 @@ const schema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
     },
+    createdAt: {
+        type: Date,
+        default: new Date()
+    },
+    updatedAt: {
+        type: Date,
+        default: new Date()
+    },
     deletedAt: {
         type: Date,
         default: ''
     }
-}, {timestamps: true});
+});
 
 module.exports = mongoose.model('Category', schema);

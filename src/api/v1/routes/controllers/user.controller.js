@@ -1,5 +1,6 @@
-const { read, readSingle, create, update, trash, restore, deletePermanently } = require('../../../../services/user.service')
+const { read, readSingle, readSingleByQuery, create, update, trash, restore, deletePermanently } = require('../../../../services/user.service')
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { filterJoiErrors } = require('../../../../helpers/error.helper')
 const { checkIfValidId, createUserValidation, updateUserValidation, loginUserValidation, usernameExists, emailExists, hashPassword } = require('../../../../helpers/validation.helper')
 
@@ -40,7 +41,7 @@ exports.createOne = async function (req, res) {
 
     try {
         const isInputValid = createUserValidation(req.body)
-        if(isInputValid.error) res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
+        if(isInputValid.error) return res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
 
         const isUsernameValid = await usernameExists(req.body.username)
         if(isUsernameValid) errors.push("username already exists")
@@ -95,8 +96,11 @@ exports.trashOne = async function (req, res) {
     try {
         if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
         
-        const result = await trash(req.params.id)
-        res.status(202).json(result)
+        let user = await trash(req.params.id)
+        user = user._doc
+        delete user.password
+
+        res.status(202).json(user)
     }
     catch (e) {
         res.status(500).send(e.message)
@@ -107,8 +111,11 @@ exports.restoreOne = async function (req, res) {
     try {
         if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
         
-        const result = await restore(req.params.id)
-        res.status(202).json(result)
+        let user = await restore(req.params.id)
+        user = user._doc
+        delete user.password
+        
+        res.status(202).json(user)
     }
     catch (e) {
         res.status(500).send(e.message)
@@ -119,8 +126,11 @@ exports.deleteOnePermanently = async function (req, res) {
     try {
         if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
         
-        const result = await deletePermanently(req.params.id)
-        res.status(202).json(result)
+        let user = await deletePermanently(req.params.id)
+        user = user._doc
+        delete user.password
+        
+        res.status(202).json(user)
     }
     catch (e) {
         res.status(500).send(e.message)
@@ -132,7 +142,7 @@ exports.register = async function (req, res) {
 
     try {
         const isInputValid = createUserValidation(req.body)
-        if(isInputValid.error) res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
+        if(isInputValid.error) return res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
 
         const isUsernameValid = await usernameExists(req.body.username)
         if(isUsernameValid) errors.push("username already exists")
@@ -160,15 +170,17 @@ exports.login = async function (req, res) {
     const validInput = loginUserValidation(req.body)
     if(validInput.error) return res.status(400).json({errors: filterJoiErrors(validInput.error.details)})
 
-    const user = await User.findOne({username: req.body.username})
+    let user = await readSingleByQuery({username: req.body.username})
     if(!user) return res.status(400).json({errors: ["username doesn't exists"]})
+    
+    if(user.deleteAt !== '') return res.status(400).json({errors: ["your account is disabled"]})
     
     if(!bcrypt.compareSync(req.body.password, user.password))
         return res.status(400).json({errors: ["password didn't match"]})
 
     try {
-		let user = await readSingle(user._id)
-		const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
+        const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
+        user = user._doc
 		delete user.password
 		
         res.status(200).json({'token': token, 'user': user})

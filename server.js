@@ -4,10 +4,6 @@ const { json, urlencoded } = require('body-parser')
 const cors = require('cors')
 require('dotenv').config()
 
-mongoose.connect(process.env.DB_CONNECTION, 
-  { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false },
-  () => { console.log('Database connected.') }
-)
 
 const app = express()
 app.use(json())
@@ -17,6 +13,15 @@ app.use(cors())
 require('./src/api/v1/routes')(app)
 
 
-app.listen(process.env.PORT || 3000, () => {
-    console.log('Server is running.')
-})
+if(process.env.NODE_ENV !== 'test') {
+  mongoose.connect(process.env.DB_CONNECTION, 
+    { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false },
+    () => { console.log('Database connected.') }
+  )
+  
+  app.listen(process.env.PORT || 3000, () => {
+      console.log('Server is running.')
+  })
+}
+
+module.exports = app

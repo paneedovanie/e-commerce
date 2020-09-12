@@ -3,7 +3,7 @@ const User = require('../models/User')
 const showFields = ['_id', 'firstName', 'lastName', 'email', 'role', 'username', 'verified', 'createdAt', 'updatedAt', 'deletedAt']
 
 //READ ALL
-function read (body) {
+exports.read = function (body) {
     try {
         return User.find(body, showFields);
     } catch (e) {
@@ -12,7 +12,7 @@ function read (body) {
 }
 
 //READ ONE
-function readSingle (id) {
+exports.readSingle = function (id) {
     try {
         return User.findById(id, showFields);
     } catch (e) {
@@ -21,7 +21,7 @@ function readSingle (id) {
 }
 
 //READ ONE BY QUERY
-function readSingleByQuery (body) {
+exports.readSingleByQuery = function (body) {
     try {
         return User.findOne(body);
     } catch (e) {
@@ -30,9 +30,9 @@ function readSingleByQuery (body) {
 }
 
 //CREATE ONE
-function create (body) {
+exports.create = function (body) {
     try {
-        const createThis = new User(body, showFields);
+        const createThis = new User(body);
         return createThis.save();
     } catch (e) {
         throw new Error(e.message)
@@ -40,7 +40,7 @@ function create (body) {
 }
 
 //UPDATE ONE
-function update (id, body) {
+exports.update = function (id, body) {
     try {
         return User.findByIdAndUpdate(id, {$set: body});
     } catch(e){
@@ -49,7 +49,7 @@ function update (id, body) {
 }
 
 //TRASH ONE
-function trash (id) {
+exports.trash = function (id) {
     try{
         return User.findByIdAndUpdate(id, {$set: { deletedAt: new Date()}});
     }catch(e){
@@ -58,7 +58,7 @@ function trash (id) {
 }
 
 //RESTORE ONE
-function restore (id) {
+exports.restore = function (id) {
     try{
         return User.findByIdAndUpdate(id, {$set: { deletedAt: ''}});
     }catch(err){
@@ -67,21 +67,10 @@ function restore (id) {
 }
 
 //DELETE ONE
-function deletePermanently (id) {
+exports.deletePermanently = function (id) {
     try{
         return User.findByIdAndDelete(id);
     }catch(err){
         throw new Error(e.message)
     }
-}
-
-module.exports = {
-    read,
-    readSingle,
-    readSingleByQuery,
-    create,
-    update,
-    trash,
-    restore,
-    deletePermanently,
 }

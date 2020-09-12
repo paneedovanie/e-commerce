@@ -7,7 +7,7 @@ const { checkIfValidId, createUserValidation, updateUserValidation, loginUserVal
 exports.readAll = async function (req, res) {
     try {
         const result = await read({deletedAt: ''})
-        res.status(201).json(result)
+        res.status(200).json(result)
     }
     catch (e) {
         res.status(500).send(e.message)
@@ -17,7 +17,7 @@ exports.readAll = async function (req, res) {
 exports.readAllTrash = async function (req, res) {
     try {
         const result = await read({deletedAt: {$ne: ''}})
-        res.status(201).json(result)
+        res.status(200).json(result)
     }
     catch (e) {
         res.status(500).send(e.message)
@@ -29,7 +29,7 @@ exports.readOne = async function (req, res) {
         if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
         
         const result = await readSingle(req.params.id)
-        res.status(201).json(result)
+        res.status(200).json(result)
     }
     catch (e) {
         res.status(500).send(e.message)
@@ -130,7 +130,7 @@ exports.deleteOnePermanently = async function (req, res) {
         user = user._doc
         delete user.password
         
-        res.status(202).json(user)
+        res.status(204).json(user)
     }
     catch (e) {
         res.status(500).send(e.message)
@@ -189,6 +189,28 @@ exports.login = async function (req, res) {
 		delete user.password
 		
         res.status(200).json({'token': token, 'user': user})
+    }
+    catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+exports.changePassword = async function (req, res) {
+    let errors = []
+
+    try {
+        if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
+
+        const validInput = changePasswordUserValidation(req.body)
+        if(validInput.error) return res.status(400).json({errors: filterJoiErrors(validInput.error.details)});
+
+        if(errors.length) return res.status(400).json({errors})
+
+        let user = await update(req.params.id, req.body)
+        user = user._doc
+        delete user.password
+
+        res.status(202).json(user)
     }
     catch (e) {
         res.status(500).send(e.message)

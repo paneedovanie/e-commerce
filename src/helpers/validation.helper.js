@@ -36,6 +36,15 @@ exports.updateUserValidation = function (input) {
     return joiSchema.validate(input);
 }
 
+exports.changePasswordUserValidation = function (input) {
+    const joiSchema = joi.object({
+        currentPassword: joi.string().required(),
+        newPassword: joi.string().required().min(6).max(255),
+    }).options({abortEarly: false});
+
+    return joiSchema.validate(input);
+}
+
 exports.loginUserValidation = function (body) {
     const joiSchema = joi.object({
         username: joi.string().required().max(255),

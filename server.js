@@ -10,6 +10,9 @@ app.use(json())
 app.use(urlencoded({extended: false}))
 app.use(cors())
 
+// ADD THIS LINE
+app.use(express.static('client/build'));
+
 require('./src/api/v1/routes')(app)
 
 if(process.env.NODE_ENV !== 'test') {

@@ -123,6 +123,15 @@ exports.emotionValidation = function (input) {
     return joiSchema.validate(input);
 }
 
+
+exports.moodValidation = function (input) {
+    const joiSchema = joi.object({
+        phrase: joi.string().required().max(255),
+    }).options({abortEarly: false});
+
+    return joiSchema.validate(input);
+}
+
 exports.rolePermissionExists = async function (model, input, id) {
     const result = await model.findOne({
         $and:[

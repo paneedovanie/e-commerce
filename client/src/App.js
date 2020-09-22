@@ -1,169 +1,105 @@
 import React, { Component } from 'react'
 
-import { fetchWeather, fetchOwnerWeather } from './api/fetchWeather'
 
 import Icon from '@mdi/react'
-import { mdiMagnify, mdiCalendarToday, mdiClockOutline } from '@mdi/js'
-
-import Map from './Map'
+import { mdiLoading } from '@mdi/js'
 
 import './App.css'
+import axios from 'axios'
 
 class App extends Component {
     constructor (props) {
         super(props)
         this.state = {
-            query: '',
-            weather: {},
-            latlng: null,
-            months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+            message: null,
+            errors: null,
+            mood: null,
+            phrase: "",
+            fetching: false
         }
-        this.getMyLocation()
-    }
-        
-    getMyLocation = async () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
-                this.setState({ latlng: {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                }})
-
-                this.searchCurrent()
-            });
-        } else {
-            console.log( "Geolocation is not supported by this browser." )
-        }
-    }
-
-    groupData = (array) => {
-        let currDate = ''
-        let object = {}
-        array.forEach(item => {
-            const itemDate = item.dt_txt.substr(0, 10)
-            if(currDate !== itemDate) {
-                currDate = itemDate
-                object = {...object, [itemDate]: [item]}
-            } else {
-                object[currDate] = [...object[currDate], item]
-            }
-        });
-        
-        return object;
-    }
-
-    pressedEnter = async (e) => {
-        if(e.key === 'Enter') {
-            this.search()
-        }
-    }
-
-    search = async () => {
-        const query = this.state.query
-        if(query === '') return
-        const data = await fetchWeather(this.state.query)
-        
-        this.setState({weather: data, query: '', latlng: { lat: data.city.coord.lat, lng: data.city.coord.lon}})
-    }
-
-    searchCurrent = async () => {
-        const data = await fetchOwnerWeather(this.state.latlng)
-        
-        this.setState({weather: data, query: '', latlng: { lat: data.city.coord.lat, lng: data.city.coord.lon}})
     }
 
     render () {
-        const query = this.state.query
-        const weather = this.state.weather
-        const latlng = this.state.latlng
-        const months = this.state.months
-
+        const { mood, phrase, fetching, errors, message } = this.state
         return (
-            <div className="main-container">
-                {latlng && (<Map latlng={latlng} />)}
-
-                <div className="search-form">
-                    <input 
-                        type="text"
-                        className="search"
-                        placeholder="Enter city"
-                        value={query}
-                        onChange={(e) => this.setState({query: e.target.value})}
-                        onKeyPress={this.pressedEnter}
-                    />
-                    <button 
-                        onClick={this.search}
-                        className="search-button"
-                    >
-                        <Icon path={mdiMagnify}
-                            title="Search icon"
-                            size={1}
-                        />
-                      </button>
-                </div>
-                {weather.city && (
-                    <div className="city">
-                        <h1 className="city-name">
-                            {weather.city.name} <span>{weather.city.country}</span>
-                        </h1>
-                        <div className="status-container">
-                            {Object.entries(this.groupData(weather.list)).map(([key, val]) => {
-                                const date = new Date(key)
-                                const formattedDate = months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear()
-                                return (
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th colSpan="100%" className="text-grey">
-                                                    <Icon path={mdiCalendarToday}
-                                                        title="Search icon"
-                                                        size={3}
-                                                        />
-                                                </th>
-                                            </tr>
-                                            <tr>
-                                                <th colSpan="100%">
-                                                    {formattedDate}
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {val.map((item, i) => {
-                                                return <Tr item={item} pkey={'r-' + i} key={i} />
-                                            })}
-                                        </tbody>
-                                    </table>
-                                )
-                            })}
+            <div className="container">
+                <form className="form" onSubmit={this.onSubmit}>
+                    { mood && (
+                        <div className="result_container">
+                            <h1 className="my_mood">Your mood is {mood}</h1>
+                            <small className="help_label">Wrong? Help me improve my service by clicking the correct answer.</small>
+                            <div className="help_button_container">
+                                <button type="button" onClick={this.helpFix.bind(this, 'happy')} hidden={mood === "happy"}>Happy</button>
+                                <button type="button" onClick={this.helpFix.bind(this, 'sad')} hidden={mood === "sad"}>Sad</button>
+                                <button type="button" onClick={this.helpFix.bind(this, 'fear')} hidden={mood === "fear"}>Fear</button>
+                                <button type="button" onClick={this.helpFix.bind(this, 'disgust')} hidden={mood === "disgust"}>Disgust</button>
+                                <button type="button" onClick={this.helpFix.bind(this, 'angry')} hidden={mood === "angry"}>Angry</button>
+                            </div>
+                            { errors && 
+                                errors.map(e => {
+                                    return <p className="error">{e}</p>
+                                })
+                            }
+                            { message && (
+                                <h3 className="message">{message}</h3>
+                            )}
                         </div>
-                    </div>
-                )}
+                    )}
+                    <h1 className="form_label">Tell me what are you thinking and, I'll guess your mood.</h1>
+                    <input 
+                        type="text" 
+                        className="form_input" 
+                        name="phrase" 
+                        placeholder="Your thoughts" 
+                        onChange={this.onChange}
+                        value={phrase}
+                        disabled={fetching}
+                    />
+                    <button type="submit" className="form_button" disabled={fetching}>
+                        { fetching ? (
+                            <Icon path={mdiLoading}
+                            title="Loading"
+                            size={1}
+                            horizontal
+                            vertical
+                            rotate={90}
+                            color="white"
+                            spin/>
+                        ): ( "Scan" )}
+                    </button>
+                </form>
             </div>
         )
     }
-}
 
-function Tr(props) {
-    return (
-        <tr key={props.pkey}>
-            <td>
-                <Icon path={mdiClockOutline}
-                    title="Time icon"
-                    size={1}
-                    className="text-orange"
-                /><br />
-                {props.item.dt_txt.substr(11, 5)}
-            </td>
-            <td className="city-temp">
-                {Math.round(props.item.main.temp)}
-                <sup>&deg;C</sup>
-            </td>
-            <td>
-                <img className="city-icon" src={`https://openweathermap.org/img/wn/${props.item.weather[0].icon}@2x.png`} alt={props.item.weather[0].description} />
-            </td>
-            <td className="city-details">{props.item.weather[0].description}</td>
-        </tr>
-    );
+    onChange = (e) => {
+        this.setState({mood: null, phrase: e.target.value})
+    }
+
+    onSubmit = (e) => {
+        if(this.state.phrase === "") return
+
+        e.preventDefault()
+        this.setState({mood: null, message: null, errors: null, fetching: true})
+        axios.post('/api/v1/emotions/mood', { phrase: this.state.phrase })
+            .then(res => {
+                this.setState({mood: res.data, fetching: false})
+            })
+            .catch((err) => {
+                this.setState({errors: err.response.data.errors, fetching: false})
+            })
+    }
+
+    helpFix = (category) => {
+        this.setState({message: null, errors: null, fetching: true})
+        axios.post('/api/v1/emotions/', { phrase: this.state.phrase, category: category })
+            .then(res => {
+                this.setState({message: 'Thank you for supporting this project! - Ed', fetching: false})
+            })
+            .catch(err => {
+                this.setState({errors: err.response.data.errors, fetching: false})
+            })
+    }
 }
 
 export default App;

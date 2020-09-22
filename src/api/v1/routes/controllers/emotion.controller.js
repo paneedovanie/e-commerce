@@ -3,11 +3,14 @@ const Crud = require('../../../../services/crud.service')
 const crud = new Crud(Emotion)
 const { filterJoiErrors } = require('../../../../helpers/error.helper')
 const { encode } = require('../../../../helpers/string.helper')
-const { checkIfValidId, emotionValidation, phraseExists } = require('../../../../helpers/validation.helper')
+const { checkIfValidId, emotionValidation, phraseExists, moodValidation } = require('../../../../helpers/validation.helper')
 const brain = require('brain.js')
 const network = new brain.NeuralNetwork()
 
 exports.readMood = async function (req, res) {
+    const isInputValid = moodValidation(req.body)
+    if(isInputValid.error) return res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
+
     const thought = req.body.phrase 
     let maxLength = thought.length
     try {
@@ -24,13 +27,14 @@ exports.readMood = async function (req, res) {
         })
 
         network.train(trainingData)
+        const result = brain.likely(encode(thought, maxLength), network)
 
-        const result = network.run(encode(thought, maxLength))
-        result.happy = result.happy.toFixed(3)
-        result.sad = result.sad.toFixed(3)
-        result.disgust = result.disgust.toFixed(3)
-        result.angry = result.angry.toFixed(3)
-        result.fear = result.fear.toFixed(3)
+        // const result = network.run(encode(thought, maxLength))
+        // result.happy = result.happy.toFixed(3)
+        // result.sad = result.sad.toFixed(3)
+        // result.disgust = result.disgust.toFixed(3)
+        // result.angry = result.angry.toFixed(3)
+        // result.fear = result.fear.toFixed(3)
 
         res.status(200).json(result)
     }
@@ -78,8 +82,8 @@ exports.createOne = async function (req, res) {
         const isInputValid = emotionValidation(req.body)
         if(isInputValid.error) return res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
 
-        const isNameValid = await phraseExists(Emotion, req.body.phrase)
-        if(isNameValid) errors.push("phrase already exists")
+        // const isNameValid = await phraseExists(Emotion, req.body.phrase)
+        // if(isNameValid) errors.push("phrase already exists")
 
         if(errors.length) return res.status(400).json({errors})
 

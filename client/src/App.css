@@ -1,111 +1,81 @@
 * {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
 body {
-    background-color: #478997;
+    background-color: rgb(223, 120, 120);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    position: relative;
 }
 
-.main-container {
-    position: relative;
-    top: 0;
-    left:0;
-}
-
-.search-form {
-    background-color: #fff;
+.container {
     display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.form {
     width: fit-content;
-    left: 50%;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 0.5rem #000;
-    position: fixed;
-    top: 1rem;
-    transform: translateX(-50%);
-}
-
-.search {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    background-color: transparent;
-}
-
-.search-button {
-    background-color: transparent;
-    border: none;
-    padding: 0.3rem;
-    color: #ec6e4c;
-}
-
-.city-name {
-    position: fixed;
-    top: 4rem;
-    left: 50%;
-    width: 100%;
-    transform: translateX(-50%);
-    background-color: rgba(255,255,255,0.7);
-    padding: 0.5rem;
-    width: fit-content;
-    display: flex;
-    border-radius: 1rem;
-    margin: 1rem auto;
-    box-shadow: 0 0 0.5rem #000;
-}
-
-.city-name span {
-    color: #eb1c1c;
-    padding: 0.5rem;
-    font-size: 0.7rem;
-    border-radius: 1rem;
-}
-
-.status-container {
-    top: 10rem;
-    position: absolute;
-    overflow-x: auto;
-    overflow-y: auto;
-    padding: 1rem;
-    display: flex;
-}
-
-.px-1 {
-    padding: 0 1rem;
-}
-
-table {
-    margin: 0 1rem;
-    background-color: rgba(255,255,255,0.7);
-    padding: 0.5rem;
-    border-radius: 1rem;
-    min-width: 20rem;
     text-align: center;
-    box-shadow: 0 0 0.5rem #000;
+    max-width: 40rem;
 }
 
-.text-orange {
-    color: #ec6e4c;
+.form_label {
+    margin-bottom: 2rem;
+    color: #ccc;
 }
 
-.text-grey {
-    color: #48484a;
+.form_input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 0.2rem #fff solid;
+    font-size: 1.5rem;
+    padding: 0.5rem;
 }
 
-.city-icon {
-    width: 5rem;
-    height: 5rem;
+.form_button {
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    padding: 0.5rem;
 }
 
-.city-temp {
-    font-size: 2rem;
-    padding-left: 1rem;
+.result_container {
+    margin-bottom: 2rem;
 }
 
-.city-details {
-    text-transform: uppercase;
-    color: #48484a;
+.my_mood {
+    font-size: 2.5rem;
+    color: #fff;
+}
+
+.help_label {
+    color: #eee;
+}
+
+.help_button_container button {
+    font-size: 1rem;
+    padding: 0.5rem;
+    margin: 0.3rem;
+    color: #fff;
+    background-color: #000;
+}
+
+.error {
+    color: rgb(240, 54, 54);
+    background-color: rgb(242, 192, 192);
+    padding: 0.5rem;
+    width: fit-content;
+    margin: 0.5rem auto;
+}
+
+.message {
+    color: rgb(0, 136, 11);
+    background-color: rgb(136, 220, 132);
+    padding: 0.5rem;
+    width: fit-content;
+    margin: 0.5rem auto;
 }

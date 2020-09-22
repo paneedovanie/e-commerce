@@ -1,6 +1,19 @@
 const mongoose = require('mongoose')
 require('dotenv').config()
-const { create: createRole } = require('../../services/role.service')
+
+const Role = require('../../models/Role')
+const Category = require('../../models/Category')
+const Permission = require('../../models/Permission')
+const RolePermission = require('../../models/RolePermission')
+const Emotion = require('../../models/Emotion')
+const Crud = require('../../services/crud.service')
+const roleCrud = new Crud(Role)
+const categoryCrud = new Crud(Category)
+const permissionCrud = new Crud(Permission)
+const rolePermissionCrud = new Crud(RolePermission)
+const emotionCrud = new Crud(Emotion)
+
+
 const ora = require('ora');
 const chalk = require("chalk");
 
@@ -27,7 +40,7 @@ exports.reset = async function () {
     })
 
     let answers = await inquirer.prompt(questions);
-    if(!answers.choice) return
+    if(!answers.choice) return false
     let spinner = ora('Resetting database...').start();
 
     try {
@@ -37,6 +50,7 @@ exports.reset = async function () {
           await collection.drop()
         }
         console.log(chalk.green.bold("\nThe database reset successfully\n"))
+        return true
     } catch (err) {
         console.error(err)
     } finally {
@@ -46,11 +60,32 @@ exports.reset = async function () {
 
 exports.seed = async function () {
     const roles = ['Superadmin', 'Admin', 'User']
+    let rolesID = [];
+    const permissions = require('../assets/permissions')
+    const emotions = require('../assets/emotions')
 
     let spinner = ora('Populating database...').start();
 
     try {
-        for (const index in roles) await createRole({name: roles[index]})
+        for (const role of roles) {
+            rolesID.push(await roleCrud.create({name: role}))
+        }
+        
+        for(var i = 0; i < permissions.length; i++) {
+            const category = await categoryCrud.create({name: permissions[i].category, type: 'permission'})
+            for (const permission of permissions[i].data) {
+                const permissionAdded = await permissionCrud.create({...permission, category: category._id})
+                await rolePermissionCrud.create({role: rolesID[0], permission: permissionAdded._id})
+            }
+        }
+        
+        for(var i = 0; i < emotions.length; i++) {
+            const category = await categoryCrud.create({name: emotions[i].category, type: 'emotion'})
+            for (const emotion of emotions[i].data) {
+                await emotionCrud.create({ phrase: emotion, category: emotions[i].category.toLowerCase()})
+            }
+        }
+
         console.log(chalk.green.bold("\nThe database was populated successfully\n"))
     } catch (err) {
         console.error(err)

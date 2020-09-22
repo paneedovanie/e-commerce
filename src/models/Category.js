@@ -14,6 +14,7 @@ const schema = mongoose.Schema({
     parent: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
+        default: null
     },
     createdAt: {
         type: Date,

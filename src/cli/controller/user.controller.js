@@ -1,6 +1,10 @@
-const { create } = require('../../services/user.service')
+const User = require('../../models/User')
+const Role = require('../../models/Role')
+const Crud = require('../../services/crud.service')
+const showFields = ['_id', 'firstName', 'lastName', 'email', 'role', 'username', 'verified', 'createdAt', 'updatedAt', 'deletedAt']
+const crud = new Crud(User, showFields)
 const { hashPassword } = require('../../helpers/validation.helper')
-const { read: readRole } = require('../../services/role.service')
+const roleCrud = new Crud(Role)
 const ora = require('ora');
 const chalk = require("chalk");
 
@@ -60,7 +64,7 @@ exports.createUser = async function () {
         }
     });
 
-    const roles = await readRole()
+    const roles = await roleCrud.read()
     
     questions.push({
         type: 'rawlist',
@@ -77,7 +81,7 @@ exports.createUser = async function () {
 
         answers.password = hashPassword(answers.password)
         answers.role = roles.find(e => e.name === answers.role)._id
-        let user = await create(answers)
+        let user = await crud.create(answers)
         
         user = user._doc
         delete user.password

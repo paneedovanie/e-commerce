@@ -12,11 +12,6 @@ app.use(cors())
 
 require('./src/api/v1/routes')(app)
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/view/index.html')
-})
-
-
 if(process.env.NODE_ENV !== 'test') {
   mongoose.connect(process.env.DB_CONNECTION, 
     { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false },

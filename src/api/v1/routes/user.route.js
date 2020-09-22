@@ -1,18 +1,21 @@
 const router = require('express').Router()
 const userController = require('./controllers/user.controller')
+const { auth } = require('./middlewares/auth.middleware')
 
 
 // CREATE USER
 router.post(
 	'/', 
+	auth('user.create'),
 	userController.createOne
 )
 
 // READ ALL USERS
 router.get(
-		'/', 
-		userController.readAll
-	)
+	'/', 
+	auth('user.read'),
+	userController.readAll	
+)
 
 // REGISTER USER
 router.post(
@@ -20,7 +23,7 @@ router.post(
 	userController.register
 )
 
-// REGISTER LOGIN
+// LOGIN
 router.post(
 	'/login', 
 	userController.login
@@ -28,38 +31,44 @@ router.post(
 
 // READ ALL TRASHED USERS
 router.get(
-		'/trashed', 
-		userController.readAllTrash
-	)
+	'/trashed', 
+	auth('user.trashed'),
+	userController.readAllTrash
+)
 
 // READ USER
 router.get(
-		'/:id', 
-		userController.readOne
-	)
+	'/:id', 
+	auth('user.read'),
+	userController.readOne
+)
 	
 // UPDATE USER
 router.patch(
-		'/:id',
-		userController.updateOne
-	)
+	'/:id',
+	auth('user.update'),
+	userController.updateOne
+)
 
 // TRASH USER
 router.patch(
-		'/:id/trash', 
-		userController.trashOne
-	)
+	'/:id/trash', 
+	auth('user.trash'),
+	userController.trashOne
+)
 
 // RESTORE USER
 router.patch(
-		'/:id/restore', 
-		userController.restoreOne
-	)
+	'/:id/restore', 
+	auth('user.restore'),
+	userController.restoreOne
+)
 
 // DELETE USER
 router.delete(
-		'/:id', 
-		userController.deleteOnePermanently
-	)
+	'/:id', 
+	auth('user.delete'),
+	userController.deleteOnePermanently
+)
 
 module.exports = router

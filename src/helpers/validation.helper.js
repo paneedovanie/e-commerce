@@ -76,3 +76,61 @@ exports.hashPassword = function (input) {
     var salt = bcrypt.genSaltSync(10)
     return bcrypt.hashSync(input, salt)
 }
+
+exports.nameExists = async function (model, name, id) {
+    const result = await model.findOne({
+        $and:[
+            { name: name },
+            { _id: { $ne: id } }
+        ]
+    })
+    return result ? true : false
+}
+
+exports.phraseExists = async function (model, phrase, id) {
+    const result = await model.findOne({
+        $and:[
+            { phrase: phrase },
+            { _id: { $ne: id } }
+        ]
+    })
+    return result ? true : false
+}
+
+exports.roleValidation = function (input) {
+    const joiSchema = joi.object({
+        name: joi.string().required().max(255),
+    }).options({abortEarly: false});
+
+    return joiSchema.validate(input);
+}
+
+exports.rolePermissionValidation = function (input) {
+    const joiSchema = joi.object({
+        role: joi.objectId().required(),
+        permission: joi.objectId().required()
+    }).options({abortEarly: false});
+
+    return joiSchema.validate(input);
+}
+
+exports.emotionValidation = function (input) {
+    const joiSchema = joi.object({
+        phrase: joi.string().required().max(255),
+        category: joi.string().required().max(255),
+    }).options({abortEarly: false});
+
+    return joiSchema.validate(input);
+}
+
+exports.rolePermissionExists = async function (model, input, id) {
+    const result = await model.findOne({
+        $and:[
+            { role: input.role },
+            { permission: input.permission },
+            { _id: {$ne: id} },
+        ]
+    })
+    return result ? true : false
+}
+

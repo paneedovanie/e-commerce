@@ -54,8 +54,8 @@ async function executeCommand(options) {
 
     if(options._.includes('db:reset')) await db.reset()
     else if(options._.includes('db:seed')) {
-        await db.reset()
-        await db.seed()
+        if(await db.reset())
+            await db.seed()
     }
     else if(options._.includes('user:create'))  await createUser()
 

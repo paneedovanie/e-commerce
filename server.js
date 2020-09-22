@@ -15,11 +15,11 @@ require('./src/api/v1/routes')(app)
 
 if(process.env.NODE_ENV !== 'test') {
   // ADD THIS LINE
-  app.use(express.static('client/build'));
+  app.use(express.static('./client/build'));
 
   // If no API routes are hit, send the React app
   app.use(function(req, res) {
-    res.sendFile(path.join(__dirname, './client/build/index.html'));
+    res.sendFile('./client/build/index.html');
   });
 
   mongoose.connect(process.env.DB_CONNECTION, 

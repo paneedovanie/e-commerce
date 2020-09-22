@@ -15,20 +15,21 @@ class App extends Component {
             errors: null,
             mood: null,
             phrase: "",
-            fetching: false
+            fetching: false,
+            helped: false
         }
     }
 
     render () {
-        const { mood, phrase, fetching, errors, message } = this.state
+        const { mood, phrase, fetching, errors, message, helped } = this.state
         return (
             <div className="container">
-                <form className="form" onSubmit={this.onSubmit}>
+                <form className="form" onSubmit={this.onSubmit} disabled={fetching}>
                     { mood && (
                         <div className="result_container">
                             <h1 className="my_mood">Your mood is {mood}</h1>
                             <small className="help_label">Wrong? Help me improve my service by clicking the correct answer.</small>
-                            <div className="help_button_container">
+                            <div className="help_button_container" hidden={helped}>
                                 <button type="button" onClick={this.helpFix.bind(this, 'happy')} hidden={mood === "happy"}>Happy</button>
                                 <button type="button" onClick={this.helpFix.bind(this, 'sad')} hidden={mood === "sad"}>Sad</button>
                                 <button type="button" onClick={this.helpFix.bind(this, 'fear')} hidden={mood === "fear"}>Fear</button>
@@ -45,8 +46,10 @@ class App extends Component {
                             )}
                         </div>
                     )}
-                    <h1 className="form_label">Tell me what are you thinking and, I'll guess your mood.</h1>
+                    <label className="form_label" for="input">Tell me what are you thinking and, I'll guess your mood.</label>
+                    <br />
                     <input 
+                        id="input"
                         type="text" 
                         className="form_input" 
                         name="phrase" 
@@ -55,7 +58,7 @@ class App extends Component {
                         value={phrase}
                         disabled={fetching}
                     />
-                    <button type="submit" className="form_button" disabled={fetching}>
+                    <button type="submit" className="form_button">
                         { fetching ? (
                             <Icon path={mdiLoading}
                             title="Loading"
@@ -80,7 +83,7 @@ class App extends Component {
         if(this.state.phrase === "") return
 
         e.preventDefault()
-        this.setState({mood: null, message: null, errors: null, fetching: true})
+        this.setState({mood: null, message: null, errors: null, fetching: true, helped: false})
         axios.post('/api/v1/emotions/mood', { phrase: this.state.phrase })
             .then(res => {
                 this.setState({mood: res.data, fetching: false})
@@ -94,7 +97,7 @@ class App extends Component {
         this.setState({message: null, errors: null, fetching: true})
         axios.post('/api/v1/emotions/', { phrase: this.state.phrase, category: category })
             .then(res => {
-                this.setState({message: 'Thank you for supporting this project! - Ed', fetching: false})
+                this.setState({helped: true, message: 'Thank you for supporting this project! - Ed', fetching: false})
             })
             .catch(err => {
                 this.setState({errors: err.response.data.errors, fetching: false})

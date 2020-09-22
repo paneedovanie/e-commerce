@@ -23,8 +23,9 @@ body {
 }
 
 .form_label {
+    font-size: 2rem;
     margin-bottom: 2rem;
-    color: #ccc;
+    color: #610000;
 }
 
 .form_input {
@@ -38,7 +39,7 @@ body {
 .form_button {
     background-color: transparent;
     border: none;
-    color: #fff;
+    color: #000;
     font-size: 1.5rem;
     padding: 0.5rem;
 }

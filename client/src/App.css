@@ -84,3 +84,22 @@ body {
 .loading {
     text-align: center;
 }
+
+.notif_button {
+    padding: 0.5rem;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 0 0.5rem #000;
+    color: rgb(223, 120, 120);
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+}
+
+.notif_button:active {
+    box-shadow: none;
+}
+
+.notif_button:hover {
+    opacity: 0.7;
+}

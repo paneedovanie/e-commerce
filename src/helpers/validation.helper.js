@@ -123,6 +123,14 @@ exports.emotionValidation = function (input) {
     return joiSchema.validate(input);
 }
 
+exports.categoryValidation = function (input) {
+    const joiSchema = joi.object({
+        name: joi.string().required().max(255),
+        type: joi.string().required().max(255),
+    }).options({abortEarly: false});
+
+    return joiSchema.validate(input);
+}
 
 exports.moodValidation = function (input) {
     const joiSchema = joi.object({

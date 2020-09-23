@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 
 import Icon from '@mdi/react'
-import { mdiLoading } from '@mdi/js'
+import { mdiLoading, mdiLanDisconnect, mdiBell } from '@mdi/js'
+// import base64Url from 'base64url'
 
 import './App.css'
 import axios from 'axios'
@@ -10,6 +11,7 @@ class App extends Component {
     constructor (props) {
         super(props)
         this.state = {
+            online: true,
             loading: true,
             message: null,
             errors: null,
@@ -22,10 +24,20 @@ class App extends Component {
     }
 
     render () {
-        const { loading, mood, phrase, fetching, errors, message, helped, moods } = this.state
+        const { online, loading, mood, phrase, fetching, errors, message, helped, moods } = this.state
 
         return (
             <div className="container">
+                {!online && (
+                    <div className="loading">
+
+                        <Icon path={mdiLanDisconnect}
+                            title="Disconnected"
+                            size={3}
+                            color="white"/>
+                        <h1>You are disconnected from the internet</h1>
+                    </div>
+                )}
                 {loading && (
                     <div className="loading">
 
@@ -40,8 +52,14 @@ class App extends Component {
                         <h1>Loading</h1>
                     </div>
                 )}
-                {!loading && (
+                {!loading && online && (
                     <form className="form" onSubmit={this.onSubmit} disabled={fetching}>
+                        <button type="button" onClick={this.requestNotifPermission} className="notif_button">
+                            <Icon path={mdiBell}
+                                title="Disconnected"
+                                size={1}
+                                />
+                        </button>
                         { mood && (
                             <div className="result_container">
                                 <h1 className="my_mood" hidden={mood === "none" ? true : false}>Your mood is {mood}</h1>
@@ -98,6 +116,12 @@ class App extends Component {
 
     componentDidMount = () => {
         this.getMoods()
+        window.addEventListener("online", () => {
+            this.setState({online: true})
+        });
+        window.addEventListener("offline", () => {
+            this.setState({online: false})
+        });
     }
 
     getMoods = async () => {
@@ -144,6 +168,64 @@ class App extends Component {
                 this.setState({errors: err.response.data.errors, fetching: false})
             })
     }
+
+    requestNotifPermission = () => {
+        Notification.requestPermission().then( async function(result) {
+            if(result === 'granted') {
+                const status = await navigator.permissions.query({
+                    name: 'periodic-background-sync',
+                });
+
+                console.log('periodic-background-sync', status.state)
+                
+                navigator.serviceWorker.getRegistration().then(function(reg) {
+                    var options = {
+                        body: 'Thank you for using Mood scan',
+                        icon: 'images/logo.png',
+                        vibrate: [100, 50, 100],
+                        data: {
+                            dateOfArrival: Date.now(),
+                            primaryKey: 1
+                        }
+                    };
+                    reg.showNotification('You may now receive notification', options);
+                });
+            }
+        });
+        this.subscribeUser()
+    }
+
+    subscribeUser = () => {
+
+        const validKey = this.urlB64ToUint8Array('BF36b_zY1wVYfiR5AOy4xG-kQ0HLmTzCNBhTCnEqA7NvnBF1pUHVmsMshzSPBeQQB5fGLDvWLl71ra4GEeazWKU')
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(function(reg) {
+                reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: validKey
+                }).then(function(sub) {
+                    console.log('Endpoint URL: ', sub.endpoint);
+                }).catch(function(e) {
+                    if (Notification.permission === 'denied') {
+                        console.warn('Permission for notifications was denied');
+                    } else {
+                        console.error('Unable to subscribe to push', e);
+                    }
+                });
+            })
+        }
+    }
+
+    urlB64ToUint8Array = base64String => {
+        const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+        const rawData = atob(base64)
+        const outputArray = new Uint8Array(rawData.length)
+        for (let i = 0; i < rawData.length; ++i) {
+          outputArray[i] = rawData.charCodeAt(i)
+        }
+        return outputArray
+      }
 }
 
 export default App;

@@ -21,6 +21,9 @@ self.addEventListener('fetch', (event) => {
         caches.match(event.request)
             .then(() => {
                 return fetch(event.request)
+                    .then(()=>{
+                        console.log('FETCH')
+                    })
                     .catch(() => caches.match('offline.html'))
             })
     )
@@ -40,3 +43,38 @@ self.addEventListener('activate', (event) => {
         ))
     )
 })
+
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close();
+  
+    event.waitUntil(
+      clients.openWindow('https://dsaesa.herokuapp.com/')
+    );
+});
+
+self.addEventListener('push', function(e) {
+    var body;
+  
+    if (e.data) {
+      body = e.data.text();
+    } else {
+      body = 'Push message no payload';
+    }
+  
+    var options = {
+      body: body,
+      icon: 'images/logo.png',
+      vibrate: [100, 50, 100],
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: 1
+      },
+    };
+    e.waitUntil(
+      self.registration.showNotification('Mood scan', options)
+    );
+});
+
+self.addEventListener('periodicsync', event => {
+    // event.waitUntil(fetchAndCacheLatestNews());
+});

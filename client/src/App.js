@@ -10,69 +10,110 @@ class App extends Component {
     constructor (props) {
         super(props)
         this.state = {
+            loading: true,
             message: null,
             errors: null,
             mood: null,
             phrase: "",
             fetching: false,
-            helped: false
+            helped: false,
+            moods: []
         }
     }
 
     render () {
-        const { mood, phrase, fetching, errors, message, helped } = this.state
+        const { loading, mood, phrase, fetching, errors, message, helped, moods } = this.state
+
         return (
             <div className="container">
-                <form className="form" onSubmit={this.onSubmit} disabled={fetching}>
-                    { mood && (
-                        <div className="result_container">
-                            <h1 className="my_mood" hidden={mood === "none" ? true : false}>Your mood is {mood}</h1>
-                            <h1 className="my_mood" hidden={mood === "none" ? false : true}>Sorry, I can't identify your mood</h1>
-                            <small className="help_label">Wrong? Help me improve my service by clicking the correct answer.</small>
-                            <div className="help_button_container" hidden={helped}>
-                                <button type="button" onClick={this.helpFix.bind(this, 'happy')} hidden={mood === "happy"}>Happy</button>
-                                <button type="button" onClick={this.helpFix.bind(this, 'sad')} hidden={mood === "sad"}>Sad</button>
-                                <button type="button" onClick={this.helpFix.bind(this, 'fear')} hidden={mood === "fear"}>Fear</button>
-                                <button type="button" onClick={this.helpFix.bind(this, 'disgust')} hidden={mood === "disgust"}>Disgust</button>
-                                <button type="button" onClick={this.helpFix.bind(this, 'angry')} hidden={mood === "angry"}>Angry</button>
-                            </div>
-                            { errors && 
-                                errors.map(e => {
-                                    return <p className="error">{e}</p>
-                                })
-                            }
-                            { message && (
-                                <h3 className="message">{message}</h3>
-                            )}
-                        </div>
-                    )}
-                    <label className="form_label" for="input">Tell me what are you thinking and, I'll guess your mood.</label>
-                    <br />
-                    <input 
-                        id="input"
-                        type="text" 
-                        className="form_input" 
-                        name="phrase" 
-                        placeholder="Your thoughts" 
-                        onChange={this.onChange}
-                        value={phrase}
-                        disabled={fetching}
-                    />
-                    <button type="submit" className="form_button">
-                        { fetching ? (
-                            <Icon path={mdiLoading}
+                {loading && (
+                    <div className="loading">
+
+                        <Icon path={mdiLoading}
                             title="Loading"
-                            size={1}
+                            size={3}
                             horizontal
                             vertical
                             rotate={90}
                             color="white"
                             spin/>
-                        ): ( "Scan" )}
-                    </button>
-                </form>
+                        <h1>Loading</h1>
+                    </div>
+                )}
+                {!loading && (
+                    <form className="form" onSubmit={this.onSubmit} disabled={fetching}>
+                        { mood && (
+                            <div className="result_container">
+                                <h1 className="my_mood" hidden={mood === "none" ? true : false}>Your mood is {mood}</h1>
+                                <h1 className="my_mood" hidden={mood === "none" ? false : true}>Sorry, I can't identify your mood</h1>
+                                <small className="help_label">Wrong? Help me improve my service by clicking the correct answer.</small>
+                                <div className="help_button_container" hidden={helped}>
+                                { moods.map((e,i) => {
+                                    return (
+                                        <button type="button" onClick={this.helpFix.bind(this, e)} key={i} hidden={mood === e}>{e}</button>
+                                    )
+                                })
+
+                                }
+                                </div>
+                                { errors && 
+                                    errors.map(e => {
+                                        return <p className="error">{e}</p>
+                                    })
+                                }
+                                { message && (
+                                    <h3 className="message">{message}</h3>
+                                )}
+                            </div>
+                        )}
+                        <label className="form_label" htmlFor="input">Tell me what are you thinking and, I'll guess your mood.</label>
+                        <br />
+                        <input 
+                            id="input"
+                            type="text" 
+                            className="form_input" 
+                            name="phrase" 
+                            placeholder="Your thoughts" 
+                            onChange={this.onChange}
+                            value={phrase}
+                            disabled={fetching}
+                        />
+                        <button type="submit" className="form_button">
+                            { fetching ? (
+                                <Icon path={mdiLoading}
+                                title="Loading"
+                                size={1}
+                                horizontal
+                                vertical
+                                rotate={90}
+                                color="white"
+                                spin/>
+                            ): ( "Scan" )}
+                        </button>
+                    </form>
+                )}
             </div>
         )
+    }
+
+    componentDidMount = () => {
+        this.getMoods()
+    }
+
+    getMoods = async () => {
+        try {
+            let result = await axios.get('/api/v1/categories?type=emotion')
+
+            let formatData = []
+
+            result.data.forEach(element => {
+                formatData.push(element.name)
+            })
+
+            this.setState({loading: false, moods: formatData})
+        } catch (err) {
+            this.setState({errors: err, fetching: false})
+        }
     }
 
     onChange = (e) => {

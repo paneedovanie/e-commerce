@@ -80,3 +80,7 @@ body {
     width: fit-content;
     margin: 0.5rem auto;
 }
+
+.loading {
+    text-align: center;
+}

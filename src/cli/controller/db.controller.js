@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-// const fs = require('fs')
+const fs = require('fs')
 require('dotenv').config()
 
 const Role = require('../../models/Role')
@@ -82,7 +82,7 @@ exports.seed = async function () {
         for(var i = 0; i < emotions.length; i++) {
             const category = await categoryCrud.create({name: emotions[i].category, type: 'emotion'})
             for (const emotion of emotions[i].data) {
-                await emotionCrud.create({ phrase: emotion, category: emotions[i].category.toLowerCase()})
+                await emotionCrud.create({ phrase: emotion.toLowerCase(), category: emotions[i].category.toLowerCase()})
             }
         }
 
@@ -111,12 +111,28 @@ exports.phraseToLowerCase = async function () {
     }
 }
 
-exports.importPhrases = async function (filename) {
-    let spinner = ora('Importing phrases...').start();
-
-    fs.readFile( filename, (err, data) => {
-        if(err) return console.log(err)
-        console.log(data)
-        spinner.stop()
+exports.importPhrases = async function (filename, category) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filename, 'utf8', async (err, data) => {
+            if(err) throw err
+            let spinner = ora('Importing phrases...').start();
+            const list = data.split('\n')
+    
+            const addToDB = []
+            try {
+                for(const item of list) {
+                    if(!addToDB.includes(item))
+                        await emotionCrud.create({ phrase: item.toLowerCase(), category: category.toLowerCase()})
+                    addToDB.push(item)
+                }
+    
+                console.log(chalk.green.bold("\nPhrases are imported successfully\n"))
+            } catch (err) {
+                console.error(err)
+            } finally {
+                spinner.stop()
+                resolve()
+            }
+        })
     })
 }

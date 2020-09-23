@@ -61,8 +61,8 @@ async function executeCommand(options) {
             await db.seed()
     }
     else if(options._.includes('user:create'))  await createUser()
-    else if(options._.includes('db->emotions:tolower'))  await db.phraseToLowerCase(options.emotion)
-
+    else if(options._.includes('db:tolower'))  await db.phraseToLowerCase()
+    else if(options._.includes('db:import')) await db.importPhrases(options._[1], options.emotion)
     db.close()
 }
    

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+// const fs = require('fs')
 require('dotenv').config()
 
 const Role = require('../../models/Role')
@@ -16,7 +17,6 @@ const emotionCrud = new Crud(Emotion)
 
 const ora = require('ora');
 const chalk = require("chalk");
-
 import inquirer from 'inquirer';
 
 exports.connect = async function () {
@@ -92,4 +92,31 @@ exports.seed = async function () {
     } finally {
         spinner.stop()
     }
+}
+
+exports.phraseToLowerCase = async function () {
+    let spinner = ora('Lowering phrases...').start();
+    try {
+        const result = await Emotion.find()
+
+        for(const item of result) {
+            await Emotion.findByIdAndUpdate(item._id, {$set: {phrase: item.phrase.toLowerCase()}})
+        }
+        
+        console.log(chalk.green.bold("\nPhrases are lowered successfully\n"))
+    } catch (err) {
+        console.error(err)
+    } finally {
+        spinner.stop()
+    }
+}
+
+exports.importPhrases = async function (filename) {
+    let spinner = ora('Importing phrases...').start();
+
+    fs.readFile( filename, (err, data) => {
+        if(err) return console.log(err)
+        console.log(data)
+        spinner.stop()
+    })
 }

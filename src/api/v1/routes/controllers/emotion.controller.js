@@ -2,41 +2,51 @@ const Emotion = require('../../../../models/Emotion')
 const Crud = require('../../../../services/crud.service')
 const crud = new Crud(Emotion)
 const { filterJoiErrors } = require('../../../../helpers/error.helper')
-const { encode } = require('../../../../helpers/string.helper')
+const { encode, strToArray } = require('../../../../helpers/string.helper')
 const { checkIfValidId, emotionValidation, phraseExists, moodValidation } = require('../../../../helpers/validation.helper')
-const brain = require('brain.js')
-const network = new brain.NeuralNetwork()
+const emotions = require('../../../../cli/assets/emotions')
 
 exports.readMood = async function (req, res) {
     const isInputValid = moodValidation(req.body)
     if(isInputValid.error) return res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
 
-    const thought = req.body.phrase 
-    let maxLength = thought.length
+    const thought = req.body.phrase.toLowerCase() 
+    const thoughtArray = strToArray(thought)
     try {
-        const emotions = await crud.read({ deletedAt: '' })
-        emotions.forEach(e => {
-            if(maxLength < e.phrase.length)
-                maxLength = e.phrase.length
-        })
-        
-        let trainingData = []
+        // let emotions = await crud.read({"$nor":[{"phrase": new RegExp(thoughtArray.join("|"))}]})
+        let emotions = []
 
-        emotions.forEach(e => {
-            trainingData.push({ input: encode(e.phrase, maxLength), output: {[e.category]: 1} })
-        })
+        for(let i = thoughtArray.length - 1; i >= 0; i--) {
+            let stringsQuery = []
+            for(let j = 0; j <= i; j++)
+                stringsQuery.push({ phrase: new RegExp(thoughtArray[j]) })
+            emotions = await Emotion.aggregate([
+                {
+                    $match: {
+                        $and: stringsQuery
+                    }
+                },
+                {
+                    $group :
+                    {
+                        _id : "$category",
+                        total: { $sum: 1 },
+                    }
+                },
+            ])
 
-        network.train(trainingData)
-        const result = brain.likely(encode(thought, maxLength), network)
+            if(emotions.length !== 0)
+                break
+        }
 
-        // const result = network.run(encode(thought, maxLength))
-        // result.happy = result.happy.toFixed(3)
-        // result.sad = result.sad.toFixed(3)
-        // result.disgust = result.disgust.toFixed(3)
-        // result.angry = result.angry.toFixed(3)
-        // result.fear = result.fear.toFixed(3)
+        let mood = 'none'
+        let currentHighestTotal = 0;
+        for(const emotion of emotions) {
+            if(currentHighestTotal < emotion.total)
+                mood = emotion._id
+        }
 
-        res.status(200).json(result)
+        res.status(200).json(mood)
     }
     catch (e) {
         res.status(500).send(e.message)
@@ -87,6 +97,7 @@ exports.createOne = async function (req, res) {
 
         if(errors.length) return res.status(400).json({errors})
 
+        req.body.phrase = req.body.phrase.toLowerCase()
         let role = await crud.create(req.body)
 
         res.status(201).json(role)
@@ -110,6 +121,7 @@ exports.updateOne = async function (req, res) {
 
         if(errors.length) return res.status(400).json({errors})
 
+        req.body.phrase = req.body.phrase.toLowerCase()
         let result = await crud.update(req.params.id, req.body)
 
         res.status(202).json(result)

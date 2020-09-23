@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 
-
 import Icon from '@mdi/react'
 import { mdiLoading } from '@mdi/js'
 
@@ -27,7 +26,8 @@ class App extends Component {
                 <form className="form" onSubmit={this.onSubmit} disabled={fetching}>
                     { mood && (
                         <div className="result_container">
-                            <h1 className="my_mood">Your mood is {mood}</h1>
+                            <h1 className="my_mood" hidden={mood === "none" ? true : false}>Your mood is {mood}</h1>
+                            <h1 className="my_mood" hidden={mood === "none" ? false : true}>Sorry, I can't identify your mood</h1>
                             <small className="help_label">Wrong? Help me improve my service by clicking the correct answer.</small>
                             <div className="help_button_container" hidden={helped}>
                                 <button type="button" onClick={this.helpFix.bind(this, 'happy')} hidden={mood === "happy"}>Happy</button>

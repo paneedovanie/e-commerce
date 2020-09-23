@@ -11,3 +11,9 @@ module.exports.encode = function (str, length) {
 
     return output
 } 
+
+module.exports.strToArray = function (str) {
+  str = str.replace(/[^a-zA-Z' ]/g, "")
+
+  return str.split(' ')
+} 

@@ -197,12 +197,12 @@ class App extends Component {
 
     subscribeUser = () => {
 
-        const validKey = this.urlB64ToUint8Array('BF36b_zY1wVYfiR5AOy4xG-kQ0HLmTzCNBhTCnEqA7NvnBF1pUHVmsMshzSPBeQQB5fGLDvWLl71ra4GEeazWKU')
+        // const validKey = this.urlB64ToUint8Array('BI_ejoGi-TB4Kh_S52zBik5bDotGG6CnixibCxDWeBpo-fwYJ_jTDzymsSgL0kcU7mLDXMbYUTGbRcCHSHM7GUU')
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.ready.then(function(reg) {
                 reg.pushManager.subscribe({
                     userVisibleOnly: true,
-                    applicationServerKey: validKey
+                    applicationServerKey: 'BI_ejoGi-TB4Kh_S52zBik5bDotGG6CnixibCxDWeBpo-fwYJ_jTDzymsSgL0kcU7mLDXMbYUTGbRcCHSHM7GUU'
                 }).then(function(sub) {
                     console.log('Endpoint URL: ', sub.endpoint);
                 }).catch(function(e) {

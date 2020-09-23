@@ -24,10 +24,10 @@
                   console.log('Not subscribed to push service!');
                 } else {
                   // We have a subscription, update the database
-                  console.log('Subscription object: ', sub);
+                  console.log(sub);
                 }
               });
-              
+
               console.log('Success: ', reg.scope)
             })
             .catch(err => console.log('Failure: ', err))

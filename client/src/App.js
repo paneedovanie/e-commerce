@@ -53,62 +53,76 @@ class App extends Component {
                     </div>
                 )}
                 {!loading && online && (
-                    <form className="form" onSubmit={this.onSubmit} disabled={fetching}>
-                        <button type="button" onClick={this.requestNotifPermission} className="notif_button">
-                            <Icon path={mdiBell}
-                                title="Disconnected"
-                                size={1}
+                    <div>
+                        { !mood && (
+                        <form className="form" onSubmit={this.onSubmit} disabled={fetching}>
+                            <button type="button" onClick={this.requestNotifPermission} className="notif_button">
+                                <Icon path={mdiBell}
+                                    title="Disconnected"
+                                    size={1}
+                                    />
+                            </button>
+                            <div>
+                                <label className="form_label" htmlFor="input">Tell me what are you thinking and, I'll guess your mood.</label>
+                                <br />
+                                <input 
+                                    id="input"
+                                    type="text" 
+                                    className="form_input" 
+                                    name="phrase" 
+                                    placeholder="Your thoughts" 
+                                    onChange={this.onChange}
+                                    value={phrase}
+                                    disabled={fetching}
                                 />
-                        </button>
+                                <br />
+                                <button type="submit" className="form_button">
+                                    { fetching ? (
+                                        <Icon path={mdiLoading}
+                                        title="Loading"
+                                        size={1}
+                                        horizontal
+                                        vertical
+                                        rotate={90}
+                                        color="white"
+                                        spin/>
+                                    ): ( "Scan" )}
+                                </button>
+                            </div>
+                        </form>
+                        )}
                         { mood && (
                             <div className="result_container">
-                                <h1 className="my_mood" hidden={mood === "none" ? true : false}>Your mood is {mood}</h1>
-                                <h1 className="my_mood" hidden={mood === "none" ? false : true}>Sorry, I can't identify your mood</h1>
-                                <small className="help_label">Wrong? Help me improve my service by clicking the correct answer.</small>
-                                <div className="help_button_container" hidden={helped}>
-                                { moods.map((e,i) => {
-                                    return (
-                                        <button type="button" onClick={this.helpFix.bind(this, e)} key={i} hidden={mood === e}>{e}</button>
-                                    )
-                                })
-
-                                }
+                                <div className="mood_container">
+                                    <h1 className="my_mood" hidden={mood === "none" ? true : false}>You are {mood}</h1>
+                                    <h1 className="my_mood" hidden={mood === "none" ? false : true}>Sorry, I can't identify your mood</h1>
                                 </div>
-                                { errors && 
-                                    errors.map(e => {
-                                        return <p className="error">{e}</p>
-                                    })
-                                }
-                                { message && (
-                                    <h3 className="message">{message}</h3>
-                                )}
+                                <div className="form">
+                                    { !helped && (
+                                        <div>
+                                            <small className="help_label">Wrong? Help me improve my service by clicking the correct answer.</small>
+                                            <div className="help_button_container">
+                                            { moods.map((e,i) => {
+                                                return (
+                                                    <button type="button" onClick={this.helpFix.bind(this, e)} key={i} hidden={mood === e}>{e}</button>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                    )}
+                                    { errors && 
+                                        errors.map(e => {
+                                            return <p className="error">{e}</p>
+                                        })
+                                    }
+                                    { message && (
+                                        <h3 className="message">{message}</h3>
+                                    )}
+                                    <button onClick={this.resetMood} className="back_button">Try again</button>
+                                </div>
                             </div>
                         )}
-                        <label className="form_label" htmlFor="input">Tell me what are you thinking and, I'll guess your mood.</label>
-                        <br />
-                        <input 
-                            id="input"
-                            type="text" 
-                            className="form_input" 
-                            name="phrase" 
-                            placeholder="Your thoughts" 
-                            onChange={this.onChange}
-                            value={phrase}
-                            disabled={fetching}
-                        />
-                        <button type="submit" className="form_button">
-                            { fetching ? (
-                                <Icon path={mdiLoading}
-                                title="Loading"
-                                size={1}
-                                horizontal
-                                vertical
-                                rotate={90}
-                                color="white"
-                                spin/>
-                            ): ( "Scan" )}
-                        </button>
-                    </form>
+                    </div>
                 )}
             </div>
         )
@@ -195,8 +209,11 @@ class App extends Component {
         this.subscribeUser()
     }
 
-    subscribeUser = () => {
+    resetMood = () => {
+        this.setState({mood: null, phrase: ""})
+    }
 
+    subscribeUser = () => {
         // const validKey = this.urlB64ToUint8Array('BI_ejoGi-TB4Kh_S52zBik5bDotGG6CnixibCxDWeBpo-fwYJ_jTDzymsSgL0kcU7mLDXMbYUTGbRcCHSHM7GUU')
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.ready.then(function(reg) {
@@ -215,17 +232,6 @@ class App extends Component {
             })
         }
     }
-
-    urlB64ToUint8Array = base64String => {
-        const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
-        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
-        const rawData = atob(base64)
-        const outputArray = new Uint8Array(rawData.length)
-        for (let i = 0; i < rawData.length; ++i) {
-          outputArray[i] = rawData.charCodeAt(i)
-        }
-        return outputArray
-      }
 }
 
-export default App;
+export default App; 

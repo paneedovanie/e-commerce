@@ -18,15 +18,15 @@
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./serviceworker.js')
             .then(async reg => {
-              reg.pushManager.getSubscription().then(function(sub) {
-                if (sub === null) {
-                  // Update UI to ask user to register for Push
-                  console.log('Not subscribed to push service!');
-                } else {
-                  // We have a subscription, update the database
-                  console.log(sub);
-                }
-              });
+              // reg.pushManager.getSubscription().then(function(sub) {
+              //   if (sub === null) {
+              //     // Update UI to ask user to register for Push
+              //     console.log('Not subscribed to push service!');
+              //   } else {
+              //     // We have a subscription, update the database
+              //     console.log(sub.toJSON());
+              //   }
+              // });
 
               console.log('Success: ', reg.scope)
             })

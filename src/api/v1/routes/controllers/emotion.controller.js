@@ -18,8 +18,10 @@ exports.readMood = async function (req, res) {
 
         for(let i = thoughtArray.length - 1; i >= 0; i--) {
             let stringsQuery = []
+
             for(let j = 0; j <= i; j++)
                 stringsQuery.push({ phrase: new RegExp(thoughtArray[j]) })
+
             emotions = await Emotion.aggregate([
                 {
                     $match: {
@@ -35,12 +37,12 @@ exports.readMood = async function (req, res) {
                 },
             ])
 
-            if(emotions.length !== 0)
-                break
+            if(emotions.length !== 0) break
         }
 
         let mood = 'none'
         let currentHighestTotal = 0;
+        
         for(const emotion of emotions) {
             if(currentHighestTotal < emotion.total)
                 mood = emotion._id

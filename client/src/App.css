@@ -1,3 +1,15 @@
+:root {
+    --primary-color: #20639B;
+    --secondary-color: #3CAEA3;
+    --accent-color: #F6D55C;
+
+    --dark-color: #000;
+    --light-color: #fff;
+    --shadow-color: #333;
+}
+
+
+
 * {
     margin: 0;
     padding: 0;
@@ -5,7 +17,7 @@
 }
 
 body {
-    background-color: rgb(223, 120, 120);
+    background-color: var(--accent-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -17,31 +29,41 @@ body {
 }
 
 .form {
-    width: fit-content;
     text-align: center;
-    max-width: 40rem;
+    background-color: var(--light-color);
+    padding: 2rem;
+    border-radius: 1rem;
 }
 
 .form_label {
     font-size: 2rem;
     margin-bottom: 2rem;
-    color: #610000;
+    color: var(--primary-color);
 }
 
 .form_input {
     background-color: transparent;
     border: none;
-    border-bottom: 0.2rem #fff solid;
+    border-bottom: 0.2rem var(--primary-color) solid;
     font-size: 1.5rem;
     padding: 0.5rem;
+    margin: 2rem;
+    text-align: center;
 }
 
 .form_button {
-    background-color: transparent;
+    background-color: var(--secondary-color);
     border: none;
-    color: #000;
-    font-size: 1.5rem;
-    padding: 0.5rem;
+    color: var(--light-color);
+    padding: 0.6rem 2rem;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 0.2rem 0.2rem var(--shadow-color);
+    border-radius: 0.3rem;
+}
+
+.form_button:active {
+    box-shadow: none;
 }
 
 .result_container {
@@ -50,19 +72,31 @@ body {
 
 .my_mood {
     font-size: 2.5rem;
-    color: #fff;
+    color: var(--primary-color);
 }
 
 .help_label {
-    color: #eee;
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.help_button_container {
+    display: flex;
+    justify-content: space-evenly;
 }
 
 .help_button_container button {
+    margin-top: 2rem;
+    background-color: var(--secondary-color);
+    border: none;
+    color: var(--light-color);
+    padding: 0.6rem;
+    font-weight: bold;
     font-size: 1rem;
-    padding: 0.5rem;
-    margin: 0.3rem;
-    color: #fff;
-    background-color: #000;
+    width: 6rem;
+    box-shadow: 0 0.2rem 0.2rem var(--shadow-color);
+    border-radius: 0.3rem;
+    margin: 0.5rem;
 }
 
 .error {
@@ -102,4 +136,23 @@ body {
 
 .notif_button:hover {
     opacity: 0.7;
+}
+
+.mood_container {
+    border-bottom: 0.3rem solid var(--primary-color);
+    margin-bottom: 3rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+.back_button {
+    margin-top: 1rem;
+    background-color: var(--dark-color);
+    border: none;
+    color: var(--light-color);
+    padding: 0.6rem 2rem;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 0.2rem 0.2rem var(--shadow-color);
+    border-radius: 0.3rem;
 }

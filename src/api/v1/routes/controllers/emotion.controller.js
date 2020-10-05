@@ -5,12 +5,18 @@ const { filterJoiErrors } = require('../../../../helpers/error.helper')
 const { encode, strToArray } = require('../../../../helpers/string.helper')
 const { checkIfValidId, emotionValidation, phraseExists, moodValidation } = require('../../../../helpers/validation.helper')
 const emotions = require('../../../../cli/assets/emotions')
+const { forbidden } = require('@hapi/joi')
 
 exports.readMood = async function (req, res) {
     const isInputValid = moodValidation(req.body)
     if(isInputValid.error) return res.status(400).json({errors: filterJoiErrors(isInputValid.error.details)})
 
     const thought = req.body.phrase.toLowerCase() 
+
+    const forbiddenWords = ["the", "is", "a", "and"]
+    if(forbiddenWords.includes(thought))
+        return res.status(400).json({errors: ["The phrase you entered is not a thought"]})
+    
     const thoughtArray = strToArray(thought)
     
     try {
@@ -44,11 +50,13 @@ exports.readMood = async function (req, res) {
         let currentHighestTotal = 0;
         
         for(const emotion of emotions) {
-            if(currentHighestTotal < emotion.total)
+            if(currentHighestTotal < emotion.total){
+                currentHighestTotal = emotion.total
                 mood = emotion._id
+            }
         }
 
-        res.status(200).json(mood)
+        res.status(200).json({currentHighestTotal, mood, emotions})
     }
     catch (e) {
         res.status(500).send(e.message)

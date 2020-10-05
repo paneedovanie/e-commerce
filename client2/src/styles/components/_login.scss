@@ -1,0 +1,71 @@
+.login_container {
+    position: relative;
+    height: 100vh;
+
+    .login {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        padding: 1rem;
+        width: 100%;
+        background-color: $light-color;
+        box-shadow: 0 0.3rem 0.2rem $shadow-color;
+
+        h1 {
+            color: $accent-color-2;
+        }
+
+        .login_error {
+            padding: 0.5rem;
+            background-color: $error-light-color;
+            color: $error-color;
+            margin: 0.5rem 0;
+            border-left: 0.3rem solid $error-color;
+        }
+
+        .login_field {
+            width: 100%;
+            background-color: rgb(4, 74, 136);
+            margin: 1rem 0; 
+            color: $accent-color-1;
+
+            input {
+                width: 100%;
+                font-size: 1.2rem;
+                padding: 0.5rem;
+            }
+
+            button {
+                width: 100%;
+                font-size: 1.2rem;
+                padding: 0.5rem;
+                background-color: $accent-color-1;
+                color: $light-color;
+                border: none;
+                box-shadow: 0 0 0.5rem $shadow-color;
+
+                &:active {
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+}
+
+@media (min-width: 600px) {
+    .login_container {
+
+        .login {
+            width: 20rem;
+        }
+    }
+}
+
+@media (min-width: 960px) {
+
+}
+
+@media (min-width: 1264px) {
+
+}

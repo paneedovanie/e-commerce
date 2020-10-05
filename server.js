@@ -15,11 +15,11 @@ require('./src/api/v1/routes')(app)
 
 if(process.env.NODE_ENV !== 'test') {
   // ADD THIS LINE
-  app.use(express.static(path.join(__dirname, './client/build')));
+  app.use(express.static(path.join(__dirname, './client/dist')));
 
   // If no API routes are hit, send the React app
   app.use('*', function(req, res) {
-    res.sendFile(path.join(__dirname, './client/build/index.html'), function(err) {
+    res.sendFile(path.join(__dirname, './client/dist/index.html'), function(err) {
       if (err) {
         res.status(500).send(err)
       }

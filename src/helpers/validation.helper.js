@@ -151,3 +151,25 @@ exports.rolePermissionExists = async function (model, input, id) {
     return result ? true : false
 }
 
+exports.quoteValidation = function (input) {
+    const joiSchema = joi.object({
+        user: joi.objectId().required(),
+        quote_id: joi.number().required(),
+        content: joi.string().required(),
+        originator: joi.object().required(),
+        tags: joi.array().required(),
+        url: joi.string().required()
+    }).options({abortEarly: false});
+
+    return joiSchema.validate(input);
+}
+
+exports.quoteExists = async function (model, user_id, quote_id) {
+    const result = await model.findOne({
+        $and:[
+            { user_id: user_id },
+            { quote_id: quote_id }
+        ]
+    })
+    return result ? true : false
+}

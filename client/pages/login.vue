@@ -1,7 +1,6 @@
 <template>
 	<div>
 		<h1 v-if="!logged">Logging in...</h1>
-		<h1 else v-text="''"></h1>
 	</div>
 </template>
 
@@ -35,6 +34,9 @@ export default {
 		})
 		.catch(err => {
 			console.error(err)
+		})
+		.finally(() => {
+			this.$router.push('/')
 		})
 	}
 }

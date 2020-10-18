@@ -1,17 +1,13 @@
-const userRoute = require('./user.route')
-const roleRoute = require('./role.route')
-const rolePermissionRoute = require('./rolePermission.route')
-const emotionRoute = require('./emotion.route')
-const categoryRoute = require('./category.route')
-const quoteRoute = require('./quote.route')
-
-
+const { getAllFiles } = require(__basedir + '/src/helpers/file.helper')
 
 module.exports = function (app) {
-    app.use('/api/v1/users', userRoute)
-    app.use('/api/v1/roles', roleRoute)
-    app.use('/api/v1/role_permissions', rolePermissionRoute)
-    app.use('/api/v1/emotions', emotionRoute)
-    app.use('/api/v1/categories', categoryRoute)
-    app.use('/api/v1/quotes', quoteRoute)
+	const FILE_EXTENSION = 'js'
+	const files = getAllFiles(__dirname, FILE_EXTENSION)
+	const removeExt = new RegExp(`\.${FILE_EXTENSION}`, 'g')
+	const removeRouteExt = new RegExp(`\.route\.${FILE_EXTENSION}`, 'g')
+
+	files.forEach(file => { 
+		if(file === `index.${FILE_EXTENSION}`) return
+		app.use(`/api/v1/${file.replace(removeRouteExt, '')}s`, require(`./${file.replace(removeExt, '')}`))
+	})
 }

@@ -1,7 +1,3 @@
-function filterJoiErrors(object) {
+module.exports.filterJoiErrors = (object) => {
     return object.map(e => e.message)
-}  
-
-module.exports = {
-    filterJoiErrors
 }

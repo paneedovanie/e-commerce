@@ -1,39 +1,30 @@
-const Role = require('../../../../models/Role')
-const Crud = require('../../../../services/crud.service')
+const Role = require(__srcdir + '/models/Role')
+const Crud = require(__srcdir + '/services/crud.service')
 const crud = new Crud(Role)
-const { filterJoiErrors } = require('../../../../helpers/error.helper')
-const { checkIfValidId, roleValidation, nameExists } = require('../../../../helpers/validation.helper')
+const { filterJoiErrors } = require(__srcdir + '/helpers/error.helper')
+const { checkIfValidId, roleValidation, nameExists } = require(__srcdir + '/helpers/validation.helper')
 
 exports.readAll = async function (req, res) {
     try {
         const result = await crud.read({ ...req.query, deletedAt: '' })
         res.status(200).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.readAllTrash = async function (req, res) {
     try {
         const result = await crud.read({ ...req.query, deletedAt: {$ne: '' }})
         res.status(200).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.readOne = async function (req, res) {
     try {
         if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
         
-        const result = await crud.readSingle(req.params.id)
+        const result = await crud.readOneById(req.params.id)
         res.status(200).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.createOne = async function (req, res) {
@@ -51,10 +42,7 @@ exports.createOne = async function (req, res) {
         let role = await crud.create(req.body)
 
         res.status(201).json(role)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.updateOne = async function (req, res) {
@@ -74,10 +62,7 @@ exports.updateOne = async function (req, res) {
         let result = await crud.update(req.params.id, req.body)
 
         res.status(202).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.trashOne = async function (req, res) {
@@ -87,10 +72,7 @@ exports.trashOne = async function (req, res) {
         let result = await crud.trash(req.params.id)
 
         res.status(202).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.restoreOne = async function (req, res) {
@@ -100,10 +82,7 @@ exports.restoreOne = async function (req, res) {
         let result = await crud.restore(req.params.id)
         
         res.status(202).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.deleteOnePermanently = async function (req, res) {
@@ -113,8 +92,5 @@ exports.deleteOnePermanently = async function (req, res) {
         let result = await crud.deletePermanently(req.params.id)
         
         res.status(204).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }

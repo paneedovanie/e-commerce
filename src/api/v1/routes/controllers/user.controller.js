@@ -11,32 +11,23 @@ exports.readAll = async function (req, res) {
     try {
         const result = await crud.read({ ...req.query, deletedAt: '' })
         res.status(200).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.readAllTrash = async function (req, res) {
     try {
         const result = await crud.read({ ...req.query, deletedAt: {$ne: '' }})
         res.status(200).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
-exports.readOne = async function (req, res) {
+exports.readOneById = async function (req, res) {
     try {
         if(!checkIfValidId(req.params.id)) return res.status(400).json({errors: ['id doesn\'t exists']})
         
-        const result = await crud.readSingle(req.params.id)
+        const result = await crud.readOneById(req.params.id)
         res.status(200).json(result)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.createOne = async function (req, res) {
@@ -61,10 +52,7 @@ exports.createOne = async function (req, res) {
         delete user.password
 
         res.status(201).json(user)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.updateOne = async function (req, res) {
@@ -89,10 +77,7 @@ exports.updateOne = async function (req, res) {
         delete user.password
 
         res.status(202).json(user)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.trashOne = async function (req, res) {
@@ -104,10 +89,7 @@ exports.trashOne = async function (req, res) {
         delete user.password
 
         res.status(202).json(user)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.restoreOne = async function (req, res) {
@@ -119,10 +101,7 @@ exports.restoreOne = async function (req, res) {
         delete user.password
         
         res.status(202).json(user)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.deleteOnePermanently = async function (req, res) {
@@ -134,10 +113,7 @@ exports.deleteOnePermanently = async function (req, res) {
         delete user.password
         
         res.status(204).json(user)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.register = async function (req, res) {
@@ -163,25 +139,20 @@ exports.register = async function (req, res) {
 		delete user.password
 		
         res.status(201).json({'token': token, 'user': user})
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.login = async function (req, res) {
     const validInput = loginUserValidation(req.body)
     if(validInput.error) return res.status(400).json({errors: filterJoiErrors(validInput.error.details)})
 
-    let user = await crud.readSingleByQuery({username: req.body.username})
+    let user = await crud.readOneByIdByQuery({username: req.body.username})
     if(!user) return res.status(400).json({errors: ["username doesn't exists"]})
     
     try {
         let time = await user.deletedAt.getTime()
         return res.status(400).json({errors: ["your account is disabled"]})
-    } catch (e) {
-        //
-    }
+    } catch (e) { res.status(500).send(e.message) }
     
     if(!bcrypt.compareSync(req.body.password, user.password))
         return res.status(400).json({errors: ["password didn't match"]})
@@ -192,10 +163,7 @@ exports.login = async function (req, res) {
 		delete user.password
 		
         res.status(200).json({'token': token, 'user': user})
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }
 
 exports.changePassword = async function (req, res) {
@@ -214,8 +182,5 @@ exports.changePassword = async function (req, res) {
         delete user.password
 
         res.status(202).json(user)
-    }
-    catch (e) {
-        res.status(500).send(e.message)
-    }
+    } catch (e) { res.status(500).send(e.message) }
 }

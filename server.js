@@ -5,6 +5,8 @@ const cors = require('cors')
 const path = require('path')
 require('dotenv').config()
 
+global.__basedir = __dirname
+global.__srcdir = __basedir + "/src"
 
 const app = express()
 app.use(json())
@@ -15,25 +17,22 @@ require('./src/api/v1/routes')(app)
 
 if(process.env.NODE_ENV !== 'test') {
   // ADD THIS LINE
-  app.use(express.static(path.join(__dirname, './client/dist')));
+  // app.use(express.static(path.join(__dirname, './client/dist')));
 
-  // If no API routes are hit, send the React app
-  app.use('*', function(req, res) {
-    res.sendFile(path.join(__dirname, './client/dist/index.html'), function(err) {
-      if (err) {
-        res.status(500).send(err)
-      }
-    });
-  });
+  // // If no API routes are hit, send the React app
+  // app.use('*', function(req, res) {
+  //   res.sendFile(
+  //     path.join(__dirname, './client/dist/index.html'), 
+  //     function(err) { if (err) res.status(500).send(err) }
+  //   );
+  // });
 
   mongoose.connect(process.env.DB_CONNECTION, 
     { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false },
     () => { console.log('Database connected.') }
   )
   
-  app.listen(process.env.PORT || 3000, () => {
-      console.log('Server is running.')
-  })
+  app.listen( process.env.PORT || 3000, () => console.log('Server is running.') )
 }
 
 module.exports = app

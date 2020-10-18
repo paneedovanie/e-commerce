@@ -2,17 +2,17 @@ const mongoose = require('mongoose')
 const fs = require('fs')
 require('dotenv').config()
 
-const Role = require('../../models/Role')
-const Category = require('../../models/Category')
-const Permission = require('../../models/Permission')
-const RolePermission = require('../../models/RolePermission')
-const Emotion = require('../../models/Emotion')
-const Crud = require('../../services/crud.service')
+const Role = require(__srcdir + '/models/Role')
+const Category = require(__srcdir + '/models/Category')
+const Permission = require(__srcdir + '/models/Permission')
+const RolePermission = require(__srcdir + '/models/RolePermission')
+// const Emotion = require(__srcdir + '/models/Emotion')
+const Crud = require(__srcdir + '/services/crud.service')
 const roleCrud = new Crud(Role)
 const categoryCrud = new Crud(Category)
 const permissionCrud = new Crud(Permission)
 const rolePermissionCrud = new Crud(RolePermission)
-const emotionCrud = new Crud(Emotion)
+// const emotionCrud = new Crud(Emotion)
 
 
 const ora = require('ora');
@@ -20,9 +20,9 @@ const chalk = require("chalk");
 import inquirer from 'inquirer';
 
 exports.connect = async function () {
-    await mongoose.connect(process.env.DB_CONNECTION, 
-        { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }
-    )
+	await mongoose.connect(process.env.DB_CONNECTION, 
+		{ useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }
+	)
 }
 
 exports.close = async function () {
@@ -51,9 +51,8 @@ exports.reset = async function () {
         }
         console.log(chalk.green.bold("\nThe database reset successfully\n"))
         return true
-    } catch (err) {
-        console.error(err)
-    } finally {
+    } catch (err) { console.error(err) } 
+    finally {
         spinner.stop()
     }
 }
@@ -87,9 +86,8 @@ exports.seed = async function () {
         }
 
         console.log(chalk.green.bold("\nThe database was populated successfully\n"))
-    } catch (err) {
-        console.error(err)
-    } finally {
+    } catch (err) { console.error(err) } 
+    finally {
         spinner.stop()
     }
 }
@@ -104,35 +102,33 @@ exports.phraseToLowerCase = async function () {
         }
         
         console.log(chalk.green.bold("\nPhrases are lowered successfully\n"))
-    } catch (err) {
-        console.error(err)
-    } finally {
+    } catch (err) { console.error(err) } 
+    finally {
         spinner.stop()
     }
 }
 
-exports.importPhrases = async function (filename, category) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(filename, 'utf8', async (err, data) => {
-            if(err) throw err
-            let spinner = ora('Importing phrases...').start();
-            const list = data.split('\n')
+// exports.importPhrases = async function (filename, category) {
+//     return new Promise((resolve, reject) => {
+//         fs.readFile(filename, 'utf8', async (err, data) => {
+//             if(err) throw err
+//             let spinner = ora('Importing phrases...').start();
+//             const list = data.split('\n')
     
-            const addToDB = []
-            try {
-                for(const item of list) {
-                    if(!addToDB.includes(item))
-                        await emotionCrud.create({ phrase: item.toLowerCase(), category: category.toLowerCase()})
-                    addToDB.push(item)
-                }
+//             const addToDB = []
+//             try {
+//                 for(const item of list) {
+//                     if(!addToDB.includes(item))
+//                         await emotionCrud.create({ phrase: item.toLowerCase(), category: category.toLowerCase()})
+//                     addToDB.push(item)
+//                 }
     
-                console.log(chalk.green.bold("\nPhrases are imported successfully\n"))
-            } catch (err) {
-                console.error(err)
-            } finally {
-                spinner.stop()
-                resolve()
-            }
-        })
-    })
-}
+//                 console.log(chalk.green.bold("\nPhrases are imported successfully\n"))
+//             } catch (err) { console.error(err) } 
+//             finally {
+//                 spinner.stop()
+//                 resolve()
+//             }
+//         })
+//     })
+// }

@@ -2,8 +2,9 @@ const CoreService = require( __srcdir + '/services/core.service' )
 const service = new CoreService(require( __srcdir + '/models/User'))
 const joi = require('@hapi/joi')
 joi.objectId = require('joi-objectid')(joi);
+const bcrypt = require('bcryptjs');
 const { filterJoiErrors } = require( __srcdir + '/helpers/error.helper')
-const { checkIfValidId, createUserValidation, updateUserValidation, loginUserValidation, usernameExists, emailExists } = require('../../../../helpers/validation.helper')
+const { checkIfValidId, createUserValidation, updateUserValidation, loginUserValidation, usernameExists, emailExists, hashPassword } = require('../../../../helpers/validation.helper')
 
 exports.loginValidation = async function (req, res, next) {
 	const validInput = loginUserValidation(req.body)
@@ -13,6 +14,7 @@ exports.loginValidation = async function (req, res, next) {
 	if(!user) return res.status(400).json({errors: ["username doesn't exists"]})
 	
 	if (user.deletedAt !== null) return res.status(400).json({errors: ["your account is disabled"]})
+	if(!bcrypt.compareSync(req.body.password, user.password)) return res.status(400).json({errors: ["password didn't match"]})
 	req._id = user._id
 
 	next()
@@ -29,6 +31,8 @@ exports.createValidation = async function (req, res, next) {
 
 	const isEmailValid = await emailExists(req.body.email)
 	if(isEmailValid) errors.push("email already exists")
+
+	req.body.password = hashPassword(req.body.password)
 
 	next()
 }

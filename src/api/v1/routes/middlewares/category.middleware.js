@@ -3,13 +3,13 @@ const service = new CoreService(require( __srcdir + '/models/Category'))
 const joi = require('@hapi/joi')
 joi.objectId = require('joi-objectid')(joi);
 const { filterJoiErrors } = require( __srcdir + '/helpers/error.helper')
-const { checkIfValidId, roleValidation, nameExists } = require('../../../../helpers/validation.helper')
+const { checkIfValidId, categoryValidation, nameExists } = require('../../../../helpers/validation.helper')
 
 exports.categoryValidation = async function (req, res, next) {
-	const validInput = roleValidation(req.body)
+	const validInput = categoryValidation(req.body)
 	if(validInput.error) return res.status(400).json({errors: filterJoiErrors(validInput.error.details)})
 
-	let result = await model.findOne({
+	let result = await service.findOne({
         $and:[
             { name: req.body.name },
             { type: req.body.type },

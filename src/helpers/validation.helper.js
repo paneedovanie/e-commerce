@@ -112,14 +112,3 @@ exports.categoryValidation = function (input) {
 
     return joiSchema.validate(input);
 }
-
-exports.rolePermissionExists = async function (model, input, id) {
-    const result = await model.findOne({
-        $and:[
-            { role: input.role },
-            { permission: input.permission },
-            { _id: {$ne: id} },
-        ]
-    })
-    return result ? true : false
-}

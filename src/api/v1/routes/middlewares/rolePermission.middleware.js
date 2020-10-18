@@ -9,7 +9,7 @@ exports.rolePermissionValidation = async function (req, res, next) {
 	const validInput = rolePermissionValidation(req.body)
 	if(validInput.error) return res.status(400).json({errors: filterJoiErrors(validInput.error.details)})
 
-	let result = await model.findOne({
+	let result = await service.findOne({
         $and:[
             { role: req.body.role },
             { permission: req.body.permission },

@@ -1,53 +1,55 @@
 const router = require('express').Router()
-const roleController = require('./controllers/role.controller')
+const Role = require( __srcdir + '/models/Role' )
+const roleController = new ApiController(Role)
+const { auth } = require('./middlewares/auth.middleware')
+const { checkIfValidId, roleValidation } = require('./middlewares/role.middleware')
 
-
-// CREATE ROLE
 router.post(
 	'/', 
-	roleController.createOne
+	[ auth('role.create'), roleValidation ],
+	roleController.createOne.bind(roleController)
 )
 
-// READ ALL ROLES
 router.get(
-		'/', 
-		roleController.readAll
-	)
+	'/', 
+	auth('role.read'),
+	roleController.readAll.bind(roleController)
+)
 
-// READ ALL TRASHED ROLES
 router.get(
-		'/trashed', 
-		roleController.readAllTrash
-	)
+	'/trashed', 
+	auth('role.trashed'),
+	roleController.readAllTrash.bind(roleController)
+)
 
-// READ ROLE
 router.get(
-		'/:id', 
-		roleController.readOne
-	)
+	'/:id', 
+	[ auth('role.read'), checkIfValidId ],
+	roleController.readOneById.bind(roleController)
+)
 	
-// UPDATE ROLE
 router.patch(
-		'/:id',
-		roleController.updateOne
-	)
+	'/:id',
+	[ auth('role.update'), checkIfValidId, roleValidation ],
+	roleController.updateOne.bind(roleController)
+)
 
-// TRASH ROLE
 router.patch(
-		'/:id/trash', 
-		roleController.trashOne
-	)
+	'/:id/trash', 
+	[ auth('role.trash'), checkIfValidId ],
+	roleController.trashOne.bind(roleController)
+)
 
-// RESTORE ROLE
 router.patch(
-		'/:id/restore', 
-		roleController.restoreOne
-	)
+	'/:id/restore', 
+	[ auth('role.restore'), checkIfValidId ],
+	roleController.restoreOne.bind(roleController)
+)
 
-// DELETE ROLE
 router.delete(
-		'/:id', 
-		roleController.deleteOnePermanently
-	)
+	'/:id', 
+	[ auth('role.delete'), checkIfValidId],
+	roleController.deleteOnePermanently.bind(roleController)
+)
 
 module.exports = router

@@ -1,53 +1,55 @@
 const router = require('express').Router()
-const rolePermissionController = require('./controllers/rolePermission.controller')
+const RolePermission = require( __srcdir + '/models/RolePermission' )
+const rolePermissionController = new ApiController(RolePermission)
+const { auth } = require('./middlewares/auth.middleware')
+const { checkIfValidId, rolePermissionValidation } = require('./middlewares/rolePermission.middleware')
 
-
-// CREATE ROLE PERMISSION
 router.post(
 	'/', 
-	rolePermissionController.createOne
+	[ auth('rolePermission.create'), rolePermissionValidation ] ,
+	rolePermissionController.createOne.bind(rolePermissionController)
 )
 
-// READ ALL ROLE PERMISSIONS
 router.get(
-		'/', 
-		rolePermissionController.readAll
-	)
+	'/', 
+	auth('rolePermission.read'),
+	rolePermissionController.readAll.bind(rolePermissionController)
+)
 
-// READ ALL TRASHED ROLE PERMISSIONS
 router.get(
-		'/trashed', 
-		rolePermissionController.readAllTrash
-	)
+	'/trashed', 
+	auth('rolePermission.trashed'),
+	rolePermissionController.readAllTrash.bind(rolePermissionController)
+)
 
-// READ ROLE PERMISSION
 router.get(
-		'/:id', 
-		rolePermissionController.readOne
-	)
+	'/:id', 
+	[ auth('rolePermission.read'), checkIfValidId ],
+	rolePermissionController.readOneById.bind(rolePermissionController)
+)
 	
-// UPDATE ROLE PERMISSION
 router.patch(
-		'/:id',
-		rolePermissionController.updateOne
-	)
+	'/:id',
+	[auth('rolePermission.update'), checkIfValidId, rolePermissionValidation ],
+	rolePermissionController.updateOne.bind(rolePermissionController)
+)
 
-// TRASH ROLE PERMISSION
 router.patch(
-		'/:id/trash', 
-		rolePermissionController.trashOne
-	)
+	'/:id/trash', 
+	[ auth('rolePermission.trash'), checkIfValidId ],
+	rolePermissionController.trashOne.bind(rolePermissionController)
+)
 
-// RESTORE ROLE PERMISSION
 router.patch(
-		'/:id/restore', 
-		rolePermissionController.restoreOne
-	)
+	'/:id/restore', 
+	[ auth('rolePermission.restore'), checkIfValidId ],
+	rolePermissionController.restoreOne.bind(rolePermissionController)
+)
 
-// DELETE ROLE PERMISSION
 router.delete(
-		'/:id', 
-		rolePermissionController.deleteOnePermanently
-	)
+	'/:id', 
+	[ auth('rolePermission.delete'), checkIfValidId ],
+	rolePermissionController.deleteOnePermanently.bind(rolePermissionController)
+)
 
 module.exports = router

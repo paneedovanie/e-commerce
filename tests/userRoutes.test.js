@@ -27,9 +27,9 @@ afterAll(async () => {
   await mongoose.disconnect();
 });
 
-describe('POST /api/v1/users', () => {
+describe('POST /api/v1/user', () => {
     it('should have return JSON with status code 201', async () => {
-        const res = await request(app).post('/api/v1/users')
+        const res = await request(app).post('/api/v1/user')
             .send({
                 firstName: 'Ed',
                 lastName: 'Hiramis',
@@ -44,36 +44,36 @@ describe('POST /api/v1/users', () => {
     })
 })
 
-describe('GET /api/v1/users/', () => {
+describe('GET /api/v1/user/', () => {
     it('should have return JSON with status code 200', async () => {
-        const res = await request(app).get('/api/v1/users')
+        const res = await request(app).get('/api/v1/user')
         
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(200)
     })
 })
 
-describe('GET /api/v1/users/trashed', () => {
+describe('GET /api/v1/user/trashed', () => {
     it('should have return JSON with status code 200', async () => {
-        const res = await request(app).get('/api/v1/users/trashed')
+        const res = await request(app).get('/api/v1/user/trashed')
         
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(200)
     })
 })
 
-describe('GET /api/v1/users/:id' , () => {
+describe('GET /api/v1/user/:id' , () => {
     it('should have return JSON with status code 200', async () => {
-        const res = await request(app).get('/api/v1/users/' + user_id)
+        const res = await request(app).get('/api/v1/user/' + user_id)
         
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(200)
     })
 })
 
-describe('PATCH /api/v1/users/:id' , () => {
+describe('PATCH /api/v1/user/:id' , () => {
     it('should have return JSON with status code 202', async () => {
-        const res = await request(app).patch('/api/v1/users/' + user_id)
+        const res = await request(app).patch('/api/v1/user/' + user_id)
             .send({
                 firstName: 'Ed',
                 lastName: 'Hiramis',
@@ -87,27 +87,27 @@ describe('PATCH /api/v1/users/:id' , () => {
     })
 })
 
-describe('PATCH /api/v1/users/:id/trash' , () => {
+describe('PATCH /api/v1/user/:id/trash' , () => {
     it('should have return JSON with status code 202', async () => {
-        const res = await request(app).patch('/api/v1/users/' + user_id + "/trash")
+        const res = await request(app).patch('/api/v1/user/' + user_id + "/trash")
             
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(202)
     })
 })
 
-describe('PATCH /api/v1/users/:id/restore' , () => {
+describe('PATCH /api/v1/user/:id/restore' , () => {
     it('should have return JSON with status code 202', async () => {
-        const res = await request(app).patch('/api/v1/users/' + user_id + "/restore")
+        const res = await request(app).patch('/api/v1/user/' + user_id + "/restore")
             
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(202)
     })
 })
 
-describe('DELETE /api/v1/users/:id/delete' , () => {
+describe('DELETE /api/v1/user/:id/delete' , () => {
     it('should have return status code 204', async () => {
-        const res = await request(app).delete('/api/v1/users/' + user_id)
+        const res = await request(app).delete('/api/v1/user/' + user_id)
             
         expect(res.statusCode).toBe(204)
     })

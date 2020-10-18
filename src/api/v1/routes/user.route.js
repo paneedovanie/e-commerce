@@ -1,74 +1,73 @@
 const router = require('express').Router()
-const userController = require('./controllers/user.controller')
+const User = require( __srcdir + '/models/User' )
+const UserController = require('./controllers/user.controller')
+const userController = new UserController(User)
 const { auth } = require('./middlewares/auth.middleware')
+const { loginValidation, createValidation, checkIfValidId } = require('./middlewares/user.middleware')
 
-
-// CREATE USER
 router.post(
 	'/', 
-	auth('user.create'),
-	userController.createOne
+	[auth('user.create'), createValidation],
+	userController.createOne.bind(userController)
 )
 
-// READ ALL USERS
 router.get(
 	'/', 
 	auth('user.read'),
-	userController.readAll	
+	userController.readAll.bind(userController)
 )
 
-// REGISTER USER
 router.post(
 	'/register', 
-	userController.register
+	createValidation,
+	userController.register.bind(userController)
 )
 
-// LOGIN
 router.post(
 	'/login', 
-	userController.login
+	loginValidation,
+	userController.login.bind(userController)
 )
 
-// READ ALL TRASHED USERS
+router.post(
+	'/', 
+	userController.register.bind(userController)
+)
+
 router.get(
 	'/trashed', 
 	auth('user.trashed'),
-	userController.readAllTrash
+	userController.readAllTrash.bind(userController)
 )
 
-// READ USER
 router.get(
 	'/:id', 
 	auth('user.read'),
-	userController.readOne
+	userController.readOneById.bind(userController)
 )
 	
-// UPDATE USER
 router.patch(
 	'/:id',
-	auth('user.update'),
-	userController.updateOne
+	[ auth('user.update'), checkIfValidId ],
+	userController.updateOne.bind(userController)
 )
 
-// TRASH USER
 router.patch(
 	'/:id/trash', 
 	auth('user.trash'),
-	userController.trashOne
+	userController.trashOne.bind(userController)
 )
 
-// RESTORE USER
 router.patch(
 	'/:id/restore', 
 	auth('user.restore'),
-	userController.restoreOne
+	userController.restoreOne.bind(userController)
 )
 
-// DELETE USER
 router.delete(
-	'/:id', 
+	'/:id',
 	auth('user.delete'),
-	userController.deleteOnePermanently
+	userController.deleteOnePermanently.bind(userController)
 )
 
 module.exports = router

@@ -1,52 +1,54 @@
 const router = require('express').Router()
-const categoryController = require('./controllers/category.controller')
+const Category = require( __srcdir + '/models/Category' )
+const categoryController = new ApiController(Category)
+const { auth } = require('./middlewares/auth.middleware')
+const { checkIfValidId, categoryValidation } = require('./middlewares/category.middleware')
 
-// CREATE CATEGORY
+
 router.post(
 	'/', 
-	categoryController.createOne
+	categoryValidation,
+	categoryController.createOne.bind(categoryController)
 )
 
-// READ ALL CATEGORIES
 router.get(
-		'/', 
-		categoryController.readAll
-	)
+	'/', 
+	categoryController.readAll.bind(categoryController)
+)
 
-// READ ALL TRASHED CATEGORIES
 router.get(
-		'/trashed', 
-		categoryController.readAllTrash
-	)
+	'/trashed', 
+	categoryController.readAllTrash.bind(categoryController)
+)
 
-// READ CATEGORY
 router.get(
-		'/:id', 
-		categoryController.readOne
-	)
+	'/:id', 
+	checkIfValidId,
+	categoryController.readOneById.bind(categoryController)
+)
 	
-// UPDATE CATEGORY
 router.patch(
-		'/:id',
-		categoryController.updateOne
-	)
+	'/:id',
+	[ checkIfValidId, categoryValidation],
+	categoryController.updateOne.bind(categoryController)
+)
 
-// TRASH CATEGORY
 router.patch(
-		'/:id/trash', 
-		categoryController.trashOne
-	)
+	'/:id/trash', 
+	checkIfValidId,
+	categoryController.trashOne.bind(categoryController)
+)
 
-// RESTORE CATEGORY
 router.patch(
-		'/:id/restore', 
-		categoryController.restoreOne
-	)
+	'/:id/restore', 
+	checkIfValidId,
+	categoryController.restoreOne.bind(categoryController)
+)
 
-// DELETE CATEGORY
 router.delete(
-		'/:id', 
-		categoryController.deleteOnePermanently
-	)
+	'/:id', 
+	checkIfValidId,
+	categoryController.deleteOnePermanently.bind(categoryController)
+)
 
 module.exports = router

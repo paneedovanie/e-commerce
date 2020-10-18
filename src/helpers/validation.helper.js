@@ -87,16 +87,6 @@ exports.nameExists = async function (model, name, id) {
     return result ? true : false
 }
 
-exports.phraseExists = async function (model, phrase, id) {
-    const result = await model.findOne({
-        $and:[
-            { phrase: phrase },
-            { _id: { $ne: id } }
-        ]
-    })
-    return result ? true : false
-}
-
 exports.roleValidation = function (input) {
     const joiSchema = joi.object({
         name: joi.string().required().max(255),
@@ -114,27 +104,10 @@ exports.rolePermissionValidation = function (input) {
     return joiSchema.validate(input);
 }
 
-exports.emotionValidation = function (input) {
-    const joiSchema = joi.object({
-        phrase: joi.string().required().max(255),
-        category: joi.string().required().max(255),
-    }).options({abortEarly: false});
-
-    return joiSchema.validate(input);
-}
-
 exports.categoryValidation = function (input) {
     const joiSchema = joi.object({
         name: joi.string().required().max(255),
         type: joi.string().required().max(255),
-    }).options({abortEarly: false});
-
-    return joiSchema.validate(input);
-}
-
-exports.moodValidation = function (input) {
-    const joiSchema = joi.object({
-        phrase: joi.string().required().max(255),
     }).options({abortEarly: false});
 
     return joiSchema.validate(input);
@@ -146,29 +119,6 @@ exports.rolePermissionExists = async function (model, input, id) {
             { role: input.role },
             { permission: input.permission },
             { _id: {$ne: id} },
-        ]
-    })
-    return result ? true : false
-}
-
-exports.quoteValidation = function (input) {
-    const joiSchema = joi.object({
-        user: joi.objectId().required(),
-        quote_id: joi.number().required(),
-        content: joi.string().required(),
-        originator: joi.object().required(),
-        tags: joi.array().required(),
-        url: joi.string().required()
-    }).options({abortEarly: false});
-
-    return joiSchema.validate(input);
-}
-
-exports.quoteExists = async function (model, user_id, quote_id) {
-    const result = await model.findOne({
-        $and:[
-            { user_id: user_id },
-            { quote_id: quote_id }
         ]
     })
     return result ? true : false

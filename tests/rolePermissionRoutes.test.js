@@ -27,9 +27,9 @@ afterAll(async () => {
   await mongoose.disconnect();
 });
 
-describe('POST /api/v1/role_permissions', () => {
+describe('POST /api/v1/rolePermission', () => {
     it('should have return JSON with status code 201', async () => {
-        const res = await request(app).post('/api/v1/role_permissions')
+        const res = await request(app).post('/api/v1/rolePermission')
             .send({
                 role: '5f66def1acebe16f5aaae3e2',
                 permission: '5f66def2acebe16f5aaae3e6'
@@ -40,36 +40,36 @@ describe('POST /api/v1/role_permissions', () => {
     })
 })
 
-describe('GET /api/v1/role_permissions/', () => {
+describe('GET /api/v1/rolePermission/', () => {
     it('should have return JSON with status code 200', async () => {
-        const res = await request(app).get('/api/v1/role_permissions')
+        const res = await request(app).get('/api/v1/rolePermission')
         
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(200)
     })
 })
 
-describe('GET /api/v1/role_permissions/trashed', () => {
+describe('GET /api/v1/rolePermission/trashed', () => {
     it('should have return JSON with status code 200', async () => {
-        const res = await request(app).get('/api/v1/role_permissions/trashed')
+        const res = await request(app).get('/api/v1/rolePermission/trashed')
         
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(200)
     })
 })
 
-describe('GET /api/v1/role_permissions/:id' , () => {
+describe('GET /api/v1/rolePermission/:id' , () => {
     it('should have return JSON with status code 200', async () => {
-        const res = await request(app).get('/api/v1/role_permissions/' + rolePermission_id)
+        const res = await request(app).get('/api/v1/rolePermission/' + rolePermission_id)
         
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(200)
     })
 })
 
-describe('PATCH /api/v1/role_permissions/:id' , () => {
+describe('PATCH /api/v1/rolePermission/:id' , () => {
     it('should have return JSON with status code 202', async () => {
-        const res = await request(app).patch('/api/v1/role_permissions/' + rolePermission_id)
+        const res = await request(app).patch('/api/v1/rolePermission/' + rolePermission_id)
             .send({
                 role: '5f66def1acebe16f5aaae3e2',
                 permission: '5f66def2acebe16f5aaae3e6'
@@ -80,27 +80,27 @@ describe('PATCH /api/v1/role_permissions/:id' , () => {
     })
 })
 
-describe('PATCH /api/v1/role_permissions/:id/trash' , () => {
+describe('PATCH /api/v1/rolePermission/:id/trash' , () => {
     it('should have return JSON with status code 202', async () => {
-        const res = await request(app).patch('/api/v1/role_permissions/' + rolePermission_id + "/trash")
+        const res = await request(app).patch('/api/v1/rolePermission/' + rolePermission_id + "/trash")
             
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(202)
     })
 })
 
-describe('PATCH /api/v1/role_permissions/:id/restore' , () => {
+describe('PATCH /api/v1/rolePermission/:id/restore' , () => {
     it('should have return JSON with status code 202', async () => {
-        const res = await request(app).patch('/api/v1/role_permissions/' + rolePermission_id + "/restore")
+        const res = await request(app).patch('/api/v1/rolePermission/' + rolePermission_id + "/restore")
             
         expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
         expect(res.statusCode).toBe(202)
     })
 })
 
-describe('DELETE /api/v1/role_permissions/:id/delete' , () => {
+describe('DELETE /api/v1/rolePermission/:id/delete' , () => {
     it('should have return status code 204', async () => {
-        const res = await request(app).delete('/api/v1/role_permissions/' + rolePermission_id)
+        const res = await request(app).delete('/api/v1/rolePermission/' + rolePermission_id)
             
         expect(res.statusCode).toBe(204)
     })

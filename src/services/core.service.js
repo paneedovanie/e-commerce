@@ -1,4 +1,4 @@
-module.exports = class Crud {
+module.exports = class CoreService {
 	constructor (model, showFields = []) {
 		this.model = model
 		this.showFields = showFields

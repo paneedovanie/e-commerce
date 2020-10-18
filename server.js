@@ -7,6 +7,7 @@ require('dotenv').config()
 
 global.__basedir = __dirname
 global.__srcdir = __basedir + "/src"
+global.ApiController = require( __srcdir + '/api/controllers/api.controller')
 
 const app = express()
 app.use(json())
@@ -31,7 +32,6 @@ if(process.env.NODE_ENV !== 'test') {
     { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false },
     () => { console.log('Database connected.') }
   )
-  
   app.listen( process.env.PORT || 3000, () => console.log('Server is running.') )
 }
 

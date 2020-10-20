@@ -6,6 +6,8 @@ npm run server - To run the server
 
 npm run dev - To both server and client in development
 
+npm run test - To run test
+
 cd client - To move to front end frame work
 
 ## Client directory

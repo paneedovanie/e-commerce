@@ -17,3 +17,9 @@ module.exports.strToArray = function (str) {
 
   return str.split(' ')
 } 
+
+module.exports.strToArray = function (str) {
+  str = str.replace(/[^a-zA-Z' ]/g, "")
+
+  return str.split(' ')
+} 

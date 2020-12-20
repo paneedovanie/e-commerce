@@ -1,18 +1,10 @@
 const mongoose = require('mongoose')
-const fs = require('fs')
 require('dotenv').config()
 
-const Role = require(__srcdir + '/models/Role')
-const Category = require(__srcdir + '/models/Category')
-const Permission = require(__srcdir + '/models/Permission')
-const RolePermission = require(__srcdir + '/models/RolePermission')
-// const Emotion = require(__srcdir + '/models/Emotion')
-const Crud = require(__srcdir + '/services/crud.service')
-const roleCrud = new Crud(Role)
-const categoryCrud = new Crud(Category)
-const permissionCrud = new Crud(Permission)
-const rolePermissionCrud = new Crud(RolePermission)
-// const emotionCrud = new Crud(Emotion)
+const roleCrud = require( `${ __srcdir }modules/Role/controllers/role.controller` )
+const categoryCrud = require( `${ __srcdir }modules/Category/controllers/category.controller` )
+const permissionCrud = require( `${ __srcdir }modules/Permission/controllers/permission.controller` )
+const rolePermissionCrud = require( `${ __srcdir }modules/Role/submodules/Permission/controllers/rolePermission.controller` )
 
 
 const ora = require('ora');
@@ -61,7 +53,6 @@ exports.seed = async function () {
     const roles = ['Superadmin', 'Admin', 'User']
     let rolesID = [];
     const permissions = require('../assets/permissions')
-    const emotions = require('../assets/emotions')
 
     let spinner = ora('Populating database...').start();
 
@@ -77,13 +68,6 @@ exports.seed = async function () {
                 await rolePermissionCrud.create({role: rolesID[0], permission: permissionAdded._id})
             }
         }
-        
-        for(var i = 0; i < emotions.length; i++) {
-            const category = await categoryCrud.create({name: emotions[i].category, type: 'emotion'})
-            for (const emotion of emotions[i].data) {
-                await emotionCrud.create({ phrase: emotion.toLowerCase(), category: emotions[i].category.toLowerCase()})
-            }
-        }
 
         console.log(chalk.green.bold("\nThe database was populated successfully\n"))
     } catch (err) { console.error(err) } 
@@ -91,44 +75,3 @@ exports.seed = async function () {
         spinner.stop()
     }
 }
-
-exports.phraseToLowerCase = async function () {
-    let spinner = ora('Lowering phrases...').start();
-    try {
-        const result = await Emotion.find()
-
-        for(const item of result) {
-            await Emotion.findByIdAndUpdate(item._id, {$set: {phrase: item.phrase.toLowerCase()}})
-        }
-        
-        console.log(chalk.green.bold("\nPhrases are lowered successfully\n"))
-    } catch (err) { console.error(err) } 
-    finally {
-        spinner.stop()
-    }
-}
-
-// exports.importPhrases = async function (filename, category) {
-//     return new Promise((resolve, reject) => {
-//         fs.readFile(filename, 'utf8', async (err, data) => {
-//             if(err) throw err
-//             let spinner = ora('Importing phrases...').start();
-//             const list = data.split('\n')
-    
-//             const addToDB = []
-//             try {
-//                 for(const item of list) {
-//                     if(!addToDB.includes(item))
-//                         await emotionCrud.create({ phrase: item.toLowerCase(), category: category.toLowerCase()})
-//                     addToDB.push(item)
-//                 }
-    
-//                 console.log(chalk.green.bold("\nPhrases are imported successfully\n"))
-//             } catch (err) { console.error(err) } 
-//             finally {
-//                 spinner.stop()
-//                 resolve()
-//             }
-//         })
-//     })
-// }

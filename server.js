@@ -1,20 +1,18 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const { json, urlencoded } = require('body-parser')
+
 const cors = require('cors')
-const path = require('path')
 require('dotenv').config()
 
-global.__basedir = __dirname
-global.__srcdir = __basedir + "/src"
-global.ApiController = require( __srcdir + '/api/controllers/api.controller')
+require('./src/config')
 
 const app = express()
 app.use(json())
 app.use(urlencoded({extended: false}))
 app.use(cors())
 
-require('./src/api/v1/routes')(app)
+require('./src/routes/api')(app)
 
 if(process.env.NODE_ENV !== 'test') {
   // ADD THIS LINE
@@ -28,11 +26,14 @@ if(process.env.NODE_ENV !== 'test') {
   //   );
   // });
 
-  mongoose.connect(process.env.DB_CONNECTION, 
+  const PORT = process.env.PORT || 3000
+  const DB_CONNECTION = process.env.DB_CONNECTION
+
+  mongoose.connect(DB_CONNECTION, 
     { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false },
     () => { console.log('Database connected.') }
   )
-  app.listen( process.env.PORT || 3000, () => console.log('Server is running.') )
+  app.listen( PORT, () => console.log(`Server is running in port ${PORT}.`) )
 }
 
 module.exports = app

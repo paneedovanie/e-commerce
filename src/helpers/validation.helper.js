@@ -1,4 +1,4 @@
-const User = require('../models/User')
+const User = require( `${ __srcdir }modules/User/models/User` )
 const joi = require('@hapi/joi')
 const bcrypt = require('bcryptjs');
 joi.objectId = require('joi-objectid')(joi);
@@ -84,6 +84,15 @@ exports.nameExists = async function (model, name, id) {
             { _id: { $ne: id } }
         ]
     })
+    return result ? true : false
+}
+
+exports.isExists = async function ({ model, id, field, value }){
+    let query = [ { [field]: value } ]
+    if(id) query.push( { _id: { $ne: id } } )
+
+    const result = await model.findOne({ $and: query })
+
     return result ? true : false
 }
 

@@ -1,15 +1,11 @@
-const User = require('../../models/User')
-const Role = require('../../models/Role')
-const Crud = require('../../services/crud.service')
 const showFields = ['_id', 'firstName', 'lastName', 'email', 'role', 'username', 'verified', 'createdAt', 'updatedAt', 'deletedAt']
-const crud = new Crud(User, showFields)
-const { hashPassword } = require('../../helpers/validation.helper')
-const roleCrud = new Crud(Role)
+const crud = require( `${ __srcdir }modules/User/controllers/user.controller` )
+const { hashPassword } = require( `${ __srcdir }helpers/string.helper` )
+const roleCrud = require( `${ __srcdir }modules/Role/controllers/role.controller` )
 const ora = require('ora');
 const chalk = require("chalk");
 
 import inquirer from 'inquirer';
-
 
 exports.createUser = async function () {
     const questions = [];

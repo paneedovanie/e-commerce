@@ -3,7 +3,7 @@ const fs = require('fs')
 module.exports.getAllFiles = (dir = '/', ext = null) => {
 	let files = []
 	fs.readdirSync(dir).forEach(function(file) {
-		const fileExt = new RegExp(`\.${ext}$`, "g")
+		const fileExt = new RegExp(``, "g")
 		if (file.match(fileExt) === null) return
 		files.push(file)
 	});

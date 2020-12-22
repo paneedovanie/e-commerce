@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 module.exports.encode = function (str, length) {
     const output = []
 
@@ -17,3 +19,14 @@ module.exports.strToArray = function (str) {
 
   return str.split(' ')
 } 
+
+module.exports.strToArray = function (str) {
+  str = str.replace(/[^a-zA-Z' ]/g, "")
+
+  return str.split(' ')
+} 
+
+module.exports.hashPassword = function (input) {
+    var salt = bcrypt.genSaltSync(10)
+    return bcrypt.hashSync(input, salt)
+}

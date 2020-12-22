@@ -1,16 +1,15 @@
-import { option } from 'yargs';
-
+require('../config')
 const db = require('./controller/db.controller')
 const { createUser } = require('./controller/user.controller')
-const { send } = require('./controller/message.controller')
 
 function parseIntoOptions(yargs) {
     return yargs
         .usage("Usage: db:reset - To reset database")
         .usage("Usage: db:seed - To reset and populate database")
         .usage("Usage: user:create - To create new user")
-        .usage("Usage: db->emotions:tolower - To change phrase into lowercase")
         .option("-e", { alias: "emotion", describe: "Emotion", type: "string" })
+        .alias('h', 'help')
+        .help('help')
         .argv;
 }
 
@@ -61,10 +60,7 @@ async function executeCommand(options) {
         if(await db.reset())
             await db.seed()
     }
-    else if(options._.includes('user:create'))  await createUser()
-    else if(options._.includes('db:tolower'))  await db.phraseToLowerCase()
-    else if(options._.includes('db:import')) await db.importPhrases(options._[1], options.emotion)
-    else if(options._.includes('message:send')) await send()
+    else if(options._.includes('make:user'))  await createUser()
     db.close()
 }
    

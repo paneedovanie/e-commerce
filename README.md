@@ -4,7 +4,7 @@
 
 npm run server - To run the server
 
-npm run dev - To both server and client in development
+npm run dev - To run both server and client in development
 
 npm run test - To run test
 

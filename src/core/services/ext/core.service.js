@@ -10,4 +10,9 @@ module.exports = class CoreService {
     const result = await this.model.findOne({ $and: query })
     return result ? true : false
   }
+
+  async isIdExists (id) {
+    const result = await this.model.find(id)
+    return result ? true : false
+  }
 }

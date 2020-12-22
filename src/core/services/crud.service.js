@@ -1,8 +1,8 @@
-const FilterService = require('./ext/core.service')
+const CoreService = require('./ext/core.service')
 
-module.exports = class CrudService extends FilterService {
-	constructor (props) {
-		super(props)
+module.exports = class CrudService extends CoreService {
+	constructor (name, controller) {
+		super(name, controller)
 	}
 
 	read (query) {

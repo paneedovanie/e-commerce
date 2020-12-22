@@ -1,6 +1,6 @@
 const showFields = ['_id', 'firstName', 'lastName', 'email', 'role', 'username', 'verified', 'createdAt', 'updatedAt', 'deletedAt']
 const crud = require( `${ __srcdir }modules/User/controllers/user.controller` )
-const { hashPassword } = require( `${ __srcdir }helpers/validation.helper` )
+const { hashPassword } = require( `${ __srcdir }helpers/string.helper` )
 const roleCrud = require( `${ __srcdir }modules/Role/controllers/role.controller` )
 const ora = require('ora');
 const chalk = require("chalk");

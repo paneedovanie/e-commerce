@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 const showFields = ['_id', 'firstName', 'lastName', 'email', 'role', 'username', 'verified', 'createdAt', 'updatedAt', 'deletedAt']
 
 class UserController extends ApiController {
-	constructor (props) {
-		super(props)
+	constructor (name, controller) {
+		super(name, controller)
 	}
 
 	async login (req, res) {

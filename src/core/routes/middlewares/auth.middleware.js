@@ -20,6 +20,7 @@ module.exports.auth = function (code = '') {
 
 					const permission_id = await permissionController.readOneByQuery({ code: code })
 					const hasPermission = await rolePermissionController.readOneByQuery({role: req.user.role, permission: permission_id})
+					
 					if(!hasPermission) return res.status(403).json({ errors: [ 'No permission to access this!' ] })
 					next();
 				} 

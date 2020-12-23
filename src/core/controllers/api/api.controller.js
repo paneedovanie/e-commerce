@@ -1,7 +1,6 @@
-const CoreService = require( '../core.controller' )
 module.exports = class ApiCrudController {
-  constructor (model, showFields = []) {
-		this.service = new CoreService(model, showFields)
+  constructor (service) {
+		this.service = service
 	}
 
 	async readAll (req, res) {

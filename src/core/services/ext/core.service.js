@@ -1,7 +1,8 @@
 module.exports = class CoreService {
-  constructor(model, showFields = []) {
+  constructor(model, showFields = [], populate) {
     this.model = model
     this.showFields = showFields
+    this.populate = 'owner ' + populate
   }
 
   async isExists (id, field, value) {

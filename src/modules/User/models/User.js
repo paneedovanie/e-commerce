@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const Timestamp = require( `${ __srcdir }/core/models/fields/Timestamp` )
+const Owner = require( `${ __srcdir }core/models/fields/Owner` );
+const SoftDelete = require( `${ __srcdir }core/models/fields/SoftDelete` )
 
 const schema = mongoose.Schema({
     firstName: {
@@ -42,10 +43,8 @@ const schema = mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    deletedAt: {
-        type: Date,
-        default: ''
-    }
+    ...SoftDelete,
+    ...Owner
 }, {timestamps: true})
 
 module.exports = mongoose.model('User', schema);

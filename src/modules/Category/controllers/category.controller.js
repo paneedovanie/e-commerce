@@ -1,4 +1,10 @@
 const Crud = require(__srcdir + 'core/controllers/core.controller')
-const Category = require('../models/Category')
+const Category = require(`${ __srcdir }modules/Category/models/Category`)
 
-module.exports = new Crud(Category)
+class CategoryController extends Crud {
+  constructor(model) {
+    super(model)
+  }
+}
+
+module.exports = new CategoryController(Category)

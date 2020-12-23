@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const Owner = require( `${ __srcdir }core/models/fields/Owner` );
+const SoftDelete = require( `${ __srcdir }core/models/fields/SoftDelete` )
 
 const schema = mongoose.Schema({
     role: {
@@ -11,10 +13,8 @@ const schema = mongoose.Schema({
         ref: "Permission",
         required: true,
     },
-    deletedAt: {
-        type: Date,
-        default: ''
-    }
+    ...SoftDelete,
+    ...Owner
 }, {timestamps: true});
 
 module.exports = mongoose.model('RolePermission', schema);

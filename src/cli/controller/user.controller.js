@@ -4,8 +4,7 @@ const { hashPassword } = require( `${ __srcdir }helpers/string.helper` )
 const roleCrud = require( `${ __srcdir }modules/Role/controllers/role.controller` )
 const ora = require('ora');
 const chalk = require("chalk");
-
-import inquirer from 'inquirer';
+const inquirer = require('inquirer');
 
 exports.createUser = async function () {
     const questions = [];

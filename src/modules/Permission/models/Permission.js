@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const SoftDelete = require( `${ __srcdir }core/models/fields/SoftDelete` )
 
 const schema = mongoose.Schema({
     code: {
@@ -16,10 +17,7 @@ const schema = mongoose.Schema({
         ref: 'Category',
         required: true,
     },
-    deletedAt: {
-        type: Date,
-        default: ''
-    }
+    ...SoftDelete,
 }, {timestamps: true});
 
 module.exports = mongoose.model('Permission', schema);

@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const Owner = require( `${ __srcdir }core/models/fields/Owner` );
+const SoftDelete = require( `${ __srcdir }core/models/fields/SoftDelete` )
 
 const schema = mongoose.Schema({
     name: {
@@ -16,18 +18,8 @@ const schema = mongoose.Schema({
         ref: 'Category',
         default: null
     },
-    createdAt: {
-        type: Date,
-        default: new Date()
-    },
-    updatedAt: {
-        type: Date,
-        default: new Date()
-    },
-    deletedAt: {
-        type: Date,
-        default: ''
-    }
-});
+    ...SoftDelete,
+    ...Owner
+}, {timestamps: true});
 
 module.exports = mongoose.model('Category', schema);

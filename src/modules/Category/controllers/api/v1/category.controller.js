@@ -1,10 +1,10 @@
 const ApiController = require( `${ __srcdir }core/controllers/api/api.controller` )
-const Category = require( `${ __srcdir }modules/Category/models/Category` )
+const categoryController = require(`../../category.controller`)
 
-class CategoryController extends ApiController {
+class ApiCategoryController extends ApiController {
 	constructor (props) {
 		super(props)
 	}
 }
 
-module.exports = new CategoryController(Category)
+module.exports = new ApiCategoryController(categoryController)

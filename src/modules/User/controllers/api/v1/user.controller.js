@@ -1,11 +1,10 @@
 const ApiController = require(__srcdir + 'core/controllers/api/api.controller')
-const User = require(`${ __srcdir }/modules/User/models/User`)
+const userController = require(`../../user.controller`)
 const jwt = require('jsonwebtoken');
-const showFields = ['_id', 'firstName', 'lastName', 'email', 'role', 'username', 'verified', 'createdAt', 'updatedAt', 'deletedAt']
 
-class UserController extends ApiController {
-	constructor (name, controller) {
-		super(name, controller)
+class ApiUserController extends ApiController {
+	constructor (service) {
+		super(service)
 	}
 
 	async login (req, res) {
@@ -14,7 +13,7 @@ class UserController extends ApiController {
 			const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
 
 			res.status(200).json({'token': token, 'user': user})
-    } catch (e) { res.status(500).send(e.message) }
+    } catch (err) { res.status(500).send(err.message) }
 	}
 
 	async register (req, res) {
@@ -25,8 +24,8 @@ class UserController extends ApiController {
 			const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET)
 		
 			res.status(201).json({'token': token, 'user': user})
-    } catch (e) { res.status(500).send(e.message) }
+    } catch (err) { res.status(500).send(err.message) }
 	}
 }
 
-module.exports = new UserController(User, showFields)
+module.exports = new ApiUserController(userController)

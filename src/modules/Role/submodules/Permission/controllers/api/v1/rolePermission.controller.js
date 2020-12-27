@@ -1,10 +1,10 @@
 const ApiController = require(__srcdir + 'core/controllers/api/api.controller')
-const RolePermission = require(`${ __srcdir }modules/Role/models/RolePermission`)
+const rolePermissionController = require(`../../rolePermission.controller`)
 
-class RolePermissionController extends ApiController {
+class ApiRolePermissionController extends ApiController {
 	constructor (props) {
 		super(props)
 	}
 }
 
-module.exports = new RolePermissionController(RolePermission)
+module.exports = new ApiRolePermissionController(rolePermissionController)

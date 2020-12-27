@@ -1,7 +1,7 @@
 const CrudService = require('../services/crud.service')
 
 module.exports = class extends CrudService {
-	constructor (name, controller) {
-		super(name, controller)
+	constructor (model, showFields, populate) {
+		super(model, showFields, populate)
 	}
 }

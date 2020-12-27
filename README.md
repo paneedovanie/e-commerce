@@ -1,5 +1,9 @@
 # loki
 
+## CLI
+
+npm install -g .
+
 ## Root directory
 
 npm run server - To run the server

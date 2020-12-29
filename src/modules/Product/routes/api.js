@@ -11,6 +11,6 @@ const {
 let productRoutes = CoreRoute(moduleName, controller, { create: validation, update: validation, checkId })
 
 module.exports = {
-  routeName: `/api/${apiVer}//s`,
+  routeName: `/api/${apiVer}/products`,
   routes: productRoutes
 }

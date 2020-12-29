@@ -6,5 +6,4 @@ class RolePermissionController extends Crud {
     super(model, showFields, populate)
   }
 }
-
 module.exports = new RolePermissionController(RolePermission, null, 'role permission') 

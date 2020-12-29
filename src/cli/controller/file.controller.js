@@ -1,9 +1,18 @@
-var fs = require('fs');
-const ora = require('ora');
-const chalk = require("chalk");
-const inquirer = require('inquirer');
+var fs = require('fs')
+const chalk = require("chalk")
+const pluralize = require('pluralize')
+const requireContext = require('node-require-context')
 
 exports.createModule = function (name) {
+  let files = requireContext("../..", true, new RegExp(`(modules)\\/\\w+\\/(models)\\/${name}\\.js`))
+  if(files.keys().length === 0)
+    files = requireContext("../..", true, new RegExp(`(modules)\\\\\\w+\\\\(models)\\\\${name}\\.js`))
+
+  if(files.keys().length > 0) {
+    console.log(chalk.red.bold("\nPlease change module name. Model already exists.\n"))
+    return
+  }
+
   if(name === '' || !name) {
     console.log(chalk.red.bold("\nPlease add module name.\n"))
     return
@@ -22,6 +31,15 @@ exports.createModule = function (name) {
 }
 
 exports.createSubModule = function (module, name) {
+  let files = requireContext("../..", true, new RegExp(`(modules)\\/\\w+\\/(models)\\/${name}\\.js`))
+  if(files.keys().length === 0)
+    files = requireContext("../..", true, new RegExp(`(modules)\\\\\\w+\\\\(models)\\\\${name}\\.js`))
+    
+  if(files.keys().length > 0) {
+    console.log(chalk.red.bold("\nPlease change module name. Model already exists.\n"))
+    return
+  }
+
   if(name === '' || !name) {
     console.log(chalk.red.bold("\nPlease add sub module name.\n"))
     return
@@ -167,7 +185,7 @@ const {
 let ${moduleNameLower}Routes = CoreRoute(moduleName, controller, { create: validation, update: validation, checkId })
 
 module.exports = {
-  routeName: \`/api/$\{apiVer}/${parentModuleNameLower}/${parent ? moduleNameLower : ''}s\`,
+  routeName: \`/api/$\{apiVer}/${ parent ? parentModuleNameLower + '/' + pluralize(moduleNameLower) : pluralize(moduleNameLower) }\`,
   routes: ${moduleNameLower}Routes
 }`,
       type: 'file'

@@ -2,16 +2,11 @@ var fs = require('fs')
 const chalk = require("chalk")
 const pluralize = require('pluralize')
 const requireContext = require('node-require-context')
+const inquirer = require('inquirer')
 
-exports.createModule = function (name) {
-  let files = requireContext("../..", true, new RegExp(`(modules)\\/\\w+\\/(models)\\/${name}\\.js`))
-  if(files.keys().length === 0)
-    files = requireContext("../..", true, new RegExp(`(modules)\\\\\\w+\\\\(models)\\\\${name}\\.js`))
-
-  if(files.keys().length > 0) {
-    console.log(chalk.red.bold("\nPlease change module name. Model already exists.\n"))
-    return
-  }
+exports.createModule = async function (name) {
+  const modelPath = await checkAndGetModel( name ) 
+  if( !modelPath ) return
 
   if(name === '' || !name) {
     console.log(chalk.red.bold("\nPlease add module name.\n"))
@@ -25,20 +20,14 @@ exports.createModule = function (name) {
     return
   }
 
-  createModuleFiles(path, name)
+  createModuleFiles(path, name, null, null, modelPath)
 
   console.log(chalk.green.bold("\nThe module created successfully.\n"))
 }
 
-exports.createSubModule = function (module, name) {
-  let files = requireContext("../..", true, new RegExp(`(modules)\\/\\w+\\/(models)\\/${name}\\.js`))
-  if(files.keys().length === 0)
-    files = requireContext("../..", true, new RegExp(`(modules)\\\\\\w+\\\\(models)\\\\${name}\\.js`))
-    
-  if(files.keys().length > 0) {
-    console.log(chalk.red.bold("\nPlease change module name. Model already exists.\n"))
-    return
-  }
+exports.createSubModule = async function (module, name) {
+  const modelPath = await checkAndGetModel( name ) 
+  if( !modelPath ) return
 
   if(name === '' || !name) {
     console.log(chalk.red.bold("\nPlease add sub module name.\n"))
@@ -60,14 +49,49 @@ exports.createSubModule = function (module, name) {
     return
   }
 
-  createModuleFiles(path, name, modulePath, moduleName)
+  createModuleFiles(path, name, modulePath, moduleName, modelPath)
 
   console.log(chalk.green.bold("\nThe module created successfully.\n"))
 }
 
-function createModuleFiles (path, name, parent, parentName) {
+async function checkAndGetModel ( name ) {
+  let files = requireContext("../..", true, new RegExp(`(modules)\\/\\w+\\/(models)\\/${name}\\.js`))
+  if(files.keys().length === 0)
+    files = requireContext("../..", true, new RegExp(`(modules)\\\\\\w+\\\\(models)\\\\${name}\\.js`))
+
+  if(files.keys().length > 0) {
+    console.log(chalk.red.bold("\nPlease change module name. Model already exists.\n"))
+    let questions = []
+    questions.push({
+      type: 'rawlist',
+      name: 'proceed',
+      message: 'Do you want to use the existing model?',
+      choices: ['Yes', 'No']
+    });
+
+    const answers = await inquirer.prompt(questions);
+
+    let indexes = []
+
+    const modelPath = files.keys()[0]
+
+    modelPath.split('').forEach((item, i) => {
+      if(item === '/') indexes.push(i)
+    })
+
+    switch(answers.proceed) {
+      case 'Yes': 
+        return modelPath.substring((indexes[indexes.length - 3]) + 1, indexes[indexes.length - 2])
+      case 'No':
+        return
+    }
+  }
+}
+
+function createModuleFiles (path, name, parent, parentName, modelPath = null) {
   const moduleNameLower = name.toLowerCase()
   const parentModuleNameLower = parentName ? parentName.toLowerCase() : ''
+  modelPath = modelPath || parentName
 
   fs.mkdirSync( path, { recursive: true } );
 
@@ -93,7 +117,7 @@ module.exports = new ApiRoleController(${moduleNameLower}Controller)`,
     {
       name: `/controllers/${moduleNameLower}.controller.js`,
       content: `const Crud = require(__srcdir + 'core/controllers/core.controller')
-const ${name} = require(\`${parent ? '${ __srcdir }modules/'+parentName+'/models' : '../models'}/${name}\`)
+const ${name} = require(\`${parent ? '${ __srcdir }modules/'+modelPath+'/models' : '../models'}/${name}\`)
 
 class ${name}Controller extends Crud {
   constructor(model) {
@@ -107,7 +131,7 @@ module.exports = new ${name}Controller(${name})`,
     {
       name: '/models',
       type: 'dir',
-      ignore: parent ? true : false
+      ignore: parent || modelPath ? true : false
     },
     {
       name: `/models/${name}.js`,
@@ -128,7 +152,8 @@ const schema = mongoose.Schema({
 
 module.exports = mongoose.model('${name}', schema)`,
       type: 'file',
-      path: parent
+      path: parent,
+      ignore: modelPath ? true : false
     },
     {
       name: '/routes/middlewares',
@@ -196,7 +221,7 @@ module.exports = {
     if(file.type === 'dir' && !file.ignore) fs.mkdirSync( `${path}${file.name}`, { recursive: true }, (err) => {
       if(err) throw err
     })
-    else if(file.type === 'file') {
+    else if(file.type === 'file' && !file.ignore) {
       let pathToUse = path
       if(file.path) pathToUse = file.path
       fs.writeFileSync( `${pathToUse}${file.name}`, file.content, function (err) {

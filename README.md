@@ -4,6 +4,8 @@
 
 npm install -g .
 
+ed-cli help
+
 ## Root directory
 
 npm run server - To run the server
